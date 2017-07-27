@@ -1,0 +1,43 @@
+\contentsline {section}{\numberline {1}Raw Data Processing}{4}{section.1}
+\contentsline {subsection}{\numberline {1.1}Setting Processing and Saving Defaults}{4}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}File Convention}{4}{subsection.1.2}
+\contentsline {subsubsection}{\numberline {1.2.1}File Format}{5}{subsubsection.1.2.1}
+\contentsline {subsubsection}{\numberline {1.2.2}File Saving Order}{5}{subsubsection.1.2.2}
+\contentsline {subsubsection}{\numberline {1.2.3}File Variable Identifiers}{5}{subsubsection.1.2.3}
+\contentsline {subsection}{\numberline {1.3}Saving Procedure}{5}{subsection.1.3}
+\contentsline {section}{\numberline {2}General Function Form}{5}{section.2}
+\contentsline {subsection}{\numberline {2.1}Varnames.csv and How to Set Variable Name Conventions}{6}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Common Function Flags and Input Conventions}{6}{subsection.2.2}
+\contentsline {section}{\numberline {3}Calculating Variability}{7}{section.3}
+\contentsline {subsection}{\numberline {3.1}Calculating Frequency Contributions to Variability}{7}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Calculating Seasonal Variability}{8}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Calculating Variability Ratios}{8}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Getting Confidence Intervals on Variability Changes}{8}{subsection.3.4}
+\contentsline {section}{\numberline {4}Mapping Results}{9}{section.4}
+\contentsline {section}{\numberline {5}Graphing Results}{9}{section.5}
+\contentsline {section}{\numberline {6}Auxiliary Functions}{9}{section.6}
+\contentsline {subsection}{\numberline {6.1}Loading calculated data}{9}{subsection.6.1}
+\contentsline {subsubsection}{\numberline {6.1.1}Loading data from \texttt {\_sqrtPower.mat} files}{10}{subsubsection.6.1.1}
+\contentsline {subsubsection}{\numberline {6.1.2}Loading data from \texttt {\_LocalMeans.mat} files}{10}{subsubsection.6.1.2}
+\contentsline {subsection}{\numberline {6.2}Subsetting data by region, value, etc.}{10}{subsection.6.2}
+\contentsline {subsubsection}{\numberline {6.2.1}Clipping data by region}{10}{subsubsection.6.2.1}
+\contentsline {subsubsection}{\numberline {6.2.2}Clipping data by latitude band}{11}{subsubsection.6.2.2}
+\contentsline {subsubsection}{\numberline {6.2.3}Clipping variability data by significance}{11}{subsubsection.6.2.3}
+\contentsline {section}{\numberline {7}Additional Functions / Files}{11}{section.7}
+\contentsline {subsection}{\numberline {7.1}Background Functions}{11}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}Third Party/Community Functions}{11}{subsection.7.2}
+\contentsline {section}{\numberline {8}Typical Code Run}{12}{section.8}
+\contentsline {section}{\numberline {A}Conventions, Names, etc. Typically Found in Model-World}{13}{appendix.A}
+\contentsline {subsection}{\numberline {A.1}Typical Model Experiments}{13}{subsection.A.1}
+\contentsline {subsubsection}{\numberline {A.1.1}Transient vs. Equilibrated Model Runs}{13}{subsubsection.A.1.1}
+\contentsline {subsubsection}{\numberline {A.1.2}The Representative Concentration Pathways (RCPs)}{13}{subsubsection.A.1.2}
+\contentsline {subsection}{\numberline {A.2}Typical Model Technical Details}{13}{subsection.A.2}
+\contentsline {subsubsection}{\numberline {A.2.1}Some Model Grids}{13}{subsubsection.A.2.1}
+\contentsline {subsubsection}{\numberline {A.2.2}Model Components}{13}{subsubsection.A.2.2}
+\contentsline {section}{\numberline {B}Math stuff}{13}{appendix.B}
+\contentsline {subsection}{\numberline {B.1}Detrending and Deseasonalization}{13}{subsection.B.1}
+\contentsline {subsubsection}{\numberline {B.1.1}Daily Data}{13}{subsubsection.B.1.1}
+\contentsline {subsubsection}{\numberline {B.1.2}Monthly Data}{14}{subsubsection.B.1.2}
+\contentsline {subsection}{\numberline {B.2}Spectral Analysis}{14}{subsection.B.2}
+\contentsline {subsection}{\numberline {B.3}Bootstrap Procedure}{16}{subsection.B.3}
+\contentsline {section}{\numberline {C}Appendix on Frequently Used Input Terms}{16}{appendix.C}
