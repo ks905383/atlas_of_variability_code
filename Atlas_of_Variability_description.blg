@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2016)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: Atlas_of_Variability_description.aux
+The style file: ieeetr.bst
+Database file #1: /Users/kschwarzwald/Documents/precip_variability/Precip_paper/paper_cites_mkii.bib
+Warning--I didn't find a database entry for "moyer_2017_changes"
+Warning--I didn't find a database entry for "schwarzwald_2017_temperature"
+You've used 3 entries,
+            1876 wiz_defined-function locations,
+            499 strings with 4222 characters,
+and the built_in function-call counts, 945 in all, are:
+= -- 97
+> -- 36
+< -- 0
++ -- 13
+- -- 10
+* -- 76
+:= -- 141
+add.period$ -- 3
+call.type$ -- 3
+change.case$ -- 3
+chr.to.int$ -- 0
+cite$ -- 3
+duplicate$ -- 42
+empty$ -- 78
+format.name$ -- 10
+if$ -- 222
+int.to.chr$ -- 0
+int.to.str$ -- 3
+missing$ -- 3
+newline$ -- 12
+num.names$ -- 3
+pop$ -- 4
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 36
+stack$ -- 0
+substring$ -- 78
+swap$ -- 21
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 12
+width$ -- 4
+write$ -- 31
+(There were 2 warnings)

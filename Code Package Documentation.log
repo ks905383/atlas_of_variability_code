@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  27 JUL 2017 15:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  27 JUL 2017 15:35
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -468,33 +468,35 @@ unc-tion header through \OT1/cmtt/m/n/10 help Maps[]stddev[]ci
 
 LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10> not available
 (Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 233.
-[9]
-
-LaTeX Warning: Reference `' on page 10 undefined on input line 262.
-
-[10]
-
-LaTeX Warning: Reference `label:var_ci' on page 11 undefined on input line 282.
-
-
-
-Overfull \hbox (87.01022pt too wide) in paragraph at lines 298--305
- [] 
- []
+[9] <RegionsMap.pdf, id=290, 196.735pt x 123.46124pt>
+File: RegionsMap.pdf Graphic file (type pdf)
+ <use RegionsMap.pdf>
+Package pdftex.def Info: RegionsMap.pdf used on input line 260.
+(pdftex.def)             Requested size: 228.0pt x 143.08136pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[11]
-Overfull \hbox (4.99225pt too wide) in paragraph at lines 314--315
+[10]
+
+LaTeX Warning: Reference `label:var_ci' on page 11 undefined on input line 288.
+
+
+[11 <./RegionsMap.pdf>]
+Overfull \hbox (87.01022pt too wide) in paragraph at lines 304--311
+ [] 
+ []
+
+
+Overfull \hbox (4.99225pt too wide) in paragraph at lines 320--321
 []\OT1/cmr/m/n/10 run \OT1/cmtt/m/n/10 Saves(5,\OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/
 10 `CSIRO-Mk3-6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ,`experiments',\OMS/cmtt/m
 /n/10 f\OT1/cmtt/m/n/10 `rcp85',`historical',`piControl'\OMS/cmtt/m/n/10 g\OT1/
 cmtt/m/n/10 )
  []
 
-
-Overfull \hbox (36.49197pt too wide) in paragraph at lines 315--316
+[12]
+Overfull \hbox (36.49197pt too wide) in paragraph at lines 321--322
 []\OT1/cmr/m/n/10 run \OT1/cmtt/m/n/10 Variability(5,\OMS/cmtt/m/n/10 f\OT1/cmt
 t/m/n/10 `CSIRO-Mk3-6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ,`experiments',\OMS/
 cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`historical',`piControl'\OMS/cmtt/m/n/10 
@@ -502,7 +504,7 @@ g\OT1/cmtt/m/n/10 )
  []
 
 
-Overfull \hbox (2.3258pt too wide) in paragraph at lines 316--317
+Overfull \hbox (2.3258pt too wide) in paragraph at lines 322--323
 []\OT1/cmr/m/n/10 run \OT1/cmtt/m/n/10 SpectralRatios(5,\OMS/cmtt/m/n/10 f\OT1/
 cmtt/m/n/10 `CSIRO-Mk3-6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ,`experiments',\O
 MS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`piControl'\OMS/cmtt/m/n/10 g\OT1/cmtt
@@ -510,7 +512,7 @@ MS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`piControl'\OMS/cmtt/m/n/10 g\OT1/cmtt
  []
 
 
-Overfull \hbox (3.43683pt too wide) in paragraph at lines 316--317
+Overfull \hbox (3.43683pt too wide) in paragraph at lines 322--323
 \OT1/cmtt/m/n/10 SpectralRatios(5,\OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `CSIRO-Mk3
 -6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ,`experiments',\OMS/cmtt/m/n/10 f\OT1/c
 mtt/m/n/10 `rcp85',`historical'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ) \OT1/cmr/m/
@@ -518,7 +520,7 @@ n/10 to save
  []
 
 
-Overfull \hbox (189.08072pt too wide) in paragraph at lines 317--318
+Overfull \hbox (189.08072pt too wide) in paragraph at lines 323--324
 []\OT1/cmr/m/n/10 run \OT1/cmtt/m/n/10 Maps[]stddevs[]ci(5,\OMS/cmtt/m/n/10 f\O
 T1/cmtt/m/n/10 `CSIRO-Mk3-6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 , `experiments
 ',\OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`piControl'\OMS/cmtt/m/n/10 g\OT1/
@@ -527,7 +529,7 @@ cmtt/m/n/10 , `show[]freqs',\OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `HF',`MF',`mean'
  []
 
 
-Overfull \hbox (26.83202pt too wide) in paragraph at lines 318--319
+Overfull \hbox (26.83202pt too wide) in paragraph at lines 324--325
 []\OT1/cmr/m/n/10 run \OT1/cmtt/m/n/10 Plots[]Log[]Panel[]prod(5, \OMS/cmtt/m/n
 /10 f\OT1/cmtt/m/n/10 `CSIRO-Mk3-6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 , `expe
 riments', \OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`piControl'\OMS/cmtt/m/n/1
@@ -535,138 +537,79 @@ riments', \OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`piControl'\OMS/cmtt/m/n/1
  []
 
 
-Overfull \hbox (51.08174pt too wide) in paragraph at lines 318--319
+Overfull \hbox (51.08174pt too wide) in paragraph at lines 324--325
 \OT1/cmtt/m/n/10 `show[]freqs', \OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `LF',`XF'\OM
 S/cmtt/m/n/10 g\OT1/cmtt/m/n/10 , `clip[]lat',30,55, `color[]by',`data', \OMS/c
 mtt/m/n/10 f\OT1/cmtt/m/n/10 `piControl'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 , \O
 MS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `mean'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ,
  []
 
-[12] <Knutti_family_tree.png, id=319, 796.4154pt x 757.3896pt>
+(./Code Package Documentation.bbl) [13]
+<Knutti_family_tree.png, id=420, 796.4154pt x 757.3896pt>
 File: Knutti_family_tree.png Graphic file (type png)
 
 <use Knutti_family_tree.png>
-Package pdftex.def Info: Knutti_family_tree.png used on input line 344.
+Package pdftex.def Info: Knutti_family_tree.png used on input line 354.
 (pdftex.def)             Requested size: 430.00462pt x 408.92651pt.
-
-
-LaTeX Warning: Reference `knutti_climate_2013' on page 13 undefined on input li
-ne 345.
-
-
-LaTeX Warning: Reference `knutti_climate_2013' on page 13 undefined on input li
-ne 345.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[13] [14] [15]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 435.
- [16] [17 <./Knutti_family_tree.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 435.
+[14] [15] [16]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 447.
+ [17] [18 <./Knutti_family_tree.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 447.
 
 (./Code Package Documentation.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 435.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 435.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 447.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 447.
+Package rerunfilecheck Info: File `"Code Package Documentation".out' has not ch
+anged.
+(rerunfilecheck)             Checksum: A0811D07AEB0E18E5349E213E519D421;3319.
 
-
-Package rerunfilecheck Warning: File `"Code Package Documentation".out' has cha
-nged.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `"Code Package Documentation".out':
-(rerunfilecheck)             Before: D364B961529B051A78964EB9D124B156;3359
-(rerunfilecheck)             After:  ADE41760D5484B846AA62284C75985B4;3331.
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 435.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 447.
  ) 
 Here is how much of TeX's memory you used:
- 7148 strings out of 493014
- 105642 string characters out of 6133351
- 201347 words of memory out of 5000000
- 10477 multiletter control sequences out of 15000+600000
+ 7150 strings out of 493014
+ 105772 string characters out of 6133351
+ 202578 words of memory out of 5000000
+ 10484 multiletter control sequences out of 15000+600000
  13487 words of font info for 53 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,18n,28p,1533b,411s stack positions out of 5000i,500n,10000p,200000b,80000s
-pdfTeX warning (dest): name{equation.10.17} has been referenced but does not 
-exist, replaced by a fixed one
-
-pdfTeX warning (dest): name{equation.10.14} has been referenced but does not ex
-ist, replaced by a fixed one
-
-pdfTeX warning (dest): name{section.11} has been referenced but does not exist,
- replaced by a fixed one
-
-pdfTeX warning (dest): name{subsection.10.3} has been referenced but does not e
-xist, replaced by a fixed one
-
-pdfTeX warning (dest): name{subsection.10.2} has been referenced but does not e
-xist, replaced by a fixed one
-
-pdfTeX warning (dest): name{subsubsection.10.1.2} has been referenced but does 
-not exist, replaced by a fixed one
-
-pdfTeX warning (dest): name{subsubsection.10.1.1} has been referenced but does 
-not exist, replaced by a fixed one
-
-pdfTeX warning (dest): name{subsection.10.1} has been referenced but does not e
-xist, replaced by a fixed one
-
-pdfTeX warning (dest): name{section.10} has been referenced but does not exist,
- replaced by a fixed one
-
-pdfTeX warning (dest): name{subsubsection.9.2.2} has been referenced but does n
-ot exist, replaced by a fixed one
-
-pdfTeX warning (dest): name{subsubsection.9.2.1} has been referenced but does n
-ot exist, replaced by a fixed one
-
-pdfTeX warning (dest): name{subsection.9.2} has been referenced but does not ex
-ist, replaced by a fixed one
-
-pdfTeX warning (dest): name{subsubsection.9.1.2} has been referenced but does n
-ot exist, replaced by a fixed one
-
-pdfTeX warning (dest): name{subsubsection.9.1.1} has been referenced but does n
-ot exist, replaced by a fixed one
-
-pdfTeX warning (dest): name{subsection.9.1} has been referenced but does not ex
-ist, replaced by a fixed one
-
-pdfTeX warning (dest): name{section.9} has been referenced but does not exist, 
-replaced by a fixed one
-
-</usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><
-/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></
-usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></u
-sr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></us
-r/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/
-local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/lo
-cal/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/loca
-l/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/
-texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/tex
-live/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texliv
-e/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2
-016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2016
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2016/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2016/te
-xmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2016/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2016/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2016/texmf
--dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on "Code Package Documentation.pdf" (17 pages, 476988 bytes).
+ 42i,18n,28p,1533b,407s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
+></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
+</usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
+/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
+usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></u
+sr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr
+/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/l
+ocal/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/l
+ocal/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/loc
+al/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local
+/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/t
+exlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texl
+ive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive
+/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/20
+16/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2016/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/2016/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2016/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2016/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2016/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2016/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2016/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2016/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
+Output written on "Code Package Documentation.pdf" (18 pages, 891499 bytes).
 PDF statistics:
- 455 PDF objects out of 1000 (max. 8388607)
- 412 compressed objects within 5 object streams
- 113 named destinations out of 1000 (max. 500000)
- 350 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 539 PDF objects out of 1000 (max. 8388607)
+ 477 compressed objects within 5 object streams
+ 104 named destinations out of 1000 (max. 500000)
+ 355 words of extra memory for PDF output out of 10000 (max. 10000000)
 

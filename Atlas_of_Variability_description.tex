@@ -1,0 +1,190 @@
+
+\documentclass[11pt]{amsart}
+%\documentclass{article}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\usepackage{mathtools}
+%\usepackage{authblk}
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{hyperref}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+
+\title{The ``Atlas of Variability'' Data Archive}
+%\author[1,2]{Elisabeth J. Moyer}
+%\author[1]{Kevin Schwarzwald}
+%\author[1]{Victor Zhorin}
+%\affil[1]{Center for Robust Decision-Making on Climate and Energy Policy (RDCEP)}
+%\affil[2]{Dept. of Geophysics, University of Chicago}
+\author{Elisabeth J. Moyer}
+\address{Center for Robust Decision-Making on Climate and Energy Policy (RDCEP)}
+\author{Kevin Schwarzwald}
+\author{Victor Zhorin}
+
+
+\begin{document}\sloppy
+\maketitle
+\section{Introduction}
+The ``Atlas of Variability'' is a project by the Center for Robust Decision-Making on Climate and Energy Policy (RDCEP) at the University of Chicago to develop a computationally efficient and standardized procedure to extract the characteristics of variability in climate models. The use of spectral analysis allows for the isolation of variability in frequency-specific climate patterns. This database currently contains the output of this analysis for 12 models, 22 variables, and 3 experiment runs from the Coupled Model Intercomparison Project's 5th iteration (CMIP5). The models were chosen to be representative of the spread of model output (informed by the climate model `genealogy' developed by \cite{knutti_climate_2013}) and to ensure consistency in data accessibility across models.
+
+Variability in this context is explicitly defined as the portion of the standard deviation contributed by patterns with frequencies within a defined range. Generally, this is interpreted to mean non-seasonal variability - the seasonal component is removed from the time series before processing. 
+
+The data is hosted using the Globus data publishing system. The collection is permanently stored at \url{https://publish.globus.org/jspui/handle/11466/102}. To access the data, you must join the RDCEP Globus Publication Users group, with instructions in the Globus interface. 
+
+Output from the ``Atlas of Variability'' has so far been used in \cite{moyer_2017_changes}, \cite{schwarzwald_2017_temperature}, etc.
+
+\subsection{Citing and Acknowledging}
+To document the use and impact of this dataset, we request a specific acknowledgement of the ``Atlas'' in addition to acknowledgements to the authors/compilers of the original data used for this project (i.e.\ CMIP5 and the individual modeling groups). In text, this dataset can be referred to as the  ``[Atlas of Variability/AoV] [archive/database/etc\dots]''. An example of a bibiographical entry for the entire database or large subsets thereof spanning multiple Globus `collections' would be as follows: 
+\\ \\
+Moyer, Elisabeth J., Kevin Schwarzwald, and Victor Zhorin. \textit{The Atlas of Variability}. V0.99. July 2017. Published by the Center for Robust Decision-Making on Climate and Energy Policy (RDCEP). Supported by the NSF through the Decision Making Under Uncertainty Program. https://publish.globus.org/jspui/handle/11466/102.
+\\\\
+For individual subsets of the collection (one model, one variable domain, etc.), the GLOBUS homepage for each dataset has a ready-made citation as a guide, i.e.\ 
+\\\\\
+Moyer, E.J.; Schwarzwald, K.; Zhorin, V., ``CMIP5 clouds variability analysis,'' 2016, http://hdl.handle.net/11466/RRN55BB
+
+
+\section{Variability Calculation}
+The core purpose of this data project is to calculate the frequency-separated variability of climatic variables; in other words, the portion of the standard deviation contributed to by patterns within certain frequencies. This is done through the following process (a more complete description is found in Appendix \ref{sec:variability_calcs}):
+
+\begin{enumerate}
+\item Detrending: a simple linear trend is removed from the time series (spectral density analysis requires stationarity)
+\item Deseasonalization: the seasonal component of variability is removed by subtracting out a 12-harmonic least-squares fit
+\item Spectral Density Calculation: a power spectrum is calculated from the resultant time series
+\item Spectral Density Integration: the standard deviation is calculated by taking the square root of the integrated spectral density between the desired frequencies
+\end{enumerate}
+
+
+\section{File Structure}
+Files are accessible from the Globus publishing system in two types of `collections,' grouped by both variable `domain' and by model. A variable `domain' is a group of related variables, such as mean 850 mb air temperature and mean, minimum, and maximum near-surface air temperature. Model names are occasionally changed for purposes of consistency with UNIX filename conventions. For example, CSIRO-Mk3.6.0 is listed as CSIRO-Mk3-6-0. 
+
+Files are named according to the following convention: 
+\begin{equation}
+\begin{split}
+\texttt{filename} = \text{[file variable identifier]\_}&\text{[data frequency]\_[model]\_[experiment]\_}\\
+&\text{[run]\_[start year]-[end year]\_varanalysis.nc}
+\end{split}
+\end{equation}
+\begin{description}
+\item [file variable identifier] shorthand variable name, e.g.\ \texttt{pr} for precipitation
+\item [data frequency] month, day, etc., using CMIP5 conventions (\_Amon / \_Lmon / \_Omon for month, for whatever reason)
+\item [model] model name in UNIX-safe character convention (so CSIRO-Mk3.6.0 becomes CSIRO-Mk3-6-0)\footnote{Occasionally, models are listed in lowercase because their original files in the CMIP5 archive were saved as such; e.g.\ `bcc-csm1-1' for BCC-CSM 1.1.} 
+\item [experiment] experiment / forcing profile, e.g.\ RCP8.5
+\item [run] run ID (in CMIP5, [r\#i\#p\#] for run number, iteration, and microphysics; for non-CMIP5, can be anything)
+\item [start year-end year] e.g.\ 2070-2099
+\end{description}
+
+In general, the \textbf{file variable identifier} follows CMIP5 naming practices. The biggest exception to this convention concerns variables that are 4-dimensional in the CMIP5 archive (with a height/pressure/depth level as the fourth dimension). To keep the file conventions as standardized as possible, each individual level in the 4th dimension is given its own file, and therefore its own variable identifier shorthand. For variables in which the fourth dimension is a pressure level, these are generally changed in the form \texttt{[original identifier][pressure level]} (i.e.\ \texttt{ta850} for 850 mb air temperature, saved as \texttt{ta} in CMIP5 parlance).  Additionally, some variables are entirely constructed from CMIP5 variables, as follows: 
+\begin{description}
+\item [cllow] Average cloud cover across `low' pressure levels (using ISCCP convention,\footnote{Taken from the `ISCCP Definition of Cloud Types' page by NASA, ISCCP: \url{https://isccp.giss.nasa.gov/cloudtypes.html}} $>$ 680 mb)
+\item [clmed] Average cloud cover across `medium' pressure levels (using ISCCP convention, 680-440 mb)
+\item [clhi] Average cloud cover across `high' medium pressure levels (using ISCCP convention, $<$ 440 mb)
+\item [rnett] Net top of atmosphere radiation. The positive direction is upwelling.
+\item [rnets] Net surface radiation. The positive direction is upwelling.
+\end{description}
+
+Each of these \texttt{\_varanalysis.nc} files contains three sets of variables: global frequency-seperated variability, some basic statistics, and a geographic grid. 
+\subsection{Frequency-separated variability}
+These variables are saved in the format \texttt{variability\_[bound1]-[bound2]\_[timestep]}. \texttt{[bound1]} and \texttt{[bound2]} are the period limits to the frequency band, in the units given by \texttt{[timestep]}. For example, the variability in (roughly) synoptic-scale climate patterns would be saved in a variable called \texttt{variability\_3-15\_days}. These variables each have three attributes - a long name (\texttt{long\_name}), units (\texttt{units}), and a vector with the integration limits used when calculating the integrated spectral density (\texttt{period\_bnds}). The long name attribute that contains a human-readable string description (i.e.\ \texttt{`3 - 15 days'} for the example above). The period bounds use 0 as a lowest bound by convention (though of course the lowest mathematically possible bound for patterns is 2). 
+
+\subsection{Basic statistics}
+In addition to frequency-separated variability, some more basic statistical properties of each pixel are saved, generally the mean and standard deviation, saved as \texttt{mean} and \texttt{std}, respectively. \texttt{std} is usually not exactly equal to the \texttt{variability\_2-Inf\_[timestep]} because of the limits of spectral density estimation. These variables have \texttt{long\_name} and \texttt{units} attributes as above. 
+
+\subsection{Geographic grid}
+The geographic grid is given by 4 variables - \texttt{lat}, \texttt{lon}, \texttt{lat\_bnds}, and \texttt{lon\_bnds}. \texttt{lat} and \texttt{lon} identify the coordinate of each pixel, and can either be 1-dimensional vectors (rectangular grids), or 2-dimensional arrays (variable grids, etc.). \texttt{lat\_bnds} and \texttt{lon\_bnds} are arrays with one more dimension (of size 2) than the \texttt{lat} and \texttt{lon} variables, giving the minimum and maximum values of \texttt{lat} and \texttt{lon} that constitute the vertices of the relevant pixel. These variables have \texttt{long\_name} and \texttt{units} attributes as above. 
+
+\subsection{Notes on File Construction}
+This dataset keeps CMIP5 naming conventions whenever possible for variable names, units, and saving conventions (yes, this includes saving precipitation in $kg/m^2s$). For more information on variable names, units, and saving conventions, please see the files on the CMIP5 guide page \href{http://cmip-pcmdi.llnl.gov/cmip5/guide_to_cmip5.html}{\underline{here}} (especially the \texttt{standard\_output} files). For more information on experiment design, please see the files on the CMIP5 Experiment Design Page \href{http://cmip-pcmdi.llnl.gov/cmip5/experiment_design.html}{\underline{here}}. 
+
+All time series used have 365-day years. For models using gregorian/leap year calendars, the 366th day of each leap year was removed before statistics were calculated. 
+
+\section{Further Notes}
+As this method is used for further projects, we intend to expand the archive to include output from those calculations in the same format as well.
+
+For questions/comments, please feel free to contact Kevin Schwarzwald (RDCEP, University of Chicago) at \href{mailto:kschwarzwald@uchicago.edu}{\underline{kschwarzwald@uchicago.edu}}.
+
+\bibliographystyle{ieeetr}
+\bibliography{/Users/kschwarzwald/Documents/precip_variability/Precip_paper/paper_cites_mkii}
+
+\appendix
+\section{Variability Calculations}
+\label{sec:variability_calcs}
+High- (i.e.\ the pattern of rain showers) and low-frequency (i.e.\ droughts, extreme precipitation events) patterns of precipitation are affected by different climatological processes, and could therefore react differently to changes in temperature and gas concentrations in addition to having differing impacts on human society. To isolate changes in variability for different precipitation processes, we use spectral density analysis to study variability in different frequency `bands' by decomposing the time series for each model output pixel into it frequency components. To do so, we largely adapt the methodology introduced in \cite{leeds_simulation_2015} and \cite{klavans_influence_2016} based on integrations over power spectra.
+
+Spectral density calculations assume stationarity in the underlying time series, so we first detrend the climatic data. We isolate non-seasonal variability by several data frequency-based deseasonalization methods. Finally, we calculate band-separated variability from power spectra. 
+%Appendix deseasonalization math
+\subsection{Detrending and Deseasonalization} %%% Detrending, Deseasonalization
+\label{sec:detrend_deseas}
+\subsubsection{Daily Data} %Daily Data
+A classic decomposition of a time series $Y$ is as follows: 
+\begin{equation}
+\begin{aligned}\centering
+Y &= X_ta + Y_c \\
+Y &= m_t + s_t + Y_c \\ 
+Y_c &= Y - m_t - s_t 
+\end{aligned}\end{equation}
+for trend $m_t$, seasonal component $s_t$ (with a known period), and a variability component $Y_c$. $m_t$ is either $0$ if the time series is already stationary (as it is with equilibrated CCSM3 runs) or is made to equal $0$ through subtracting a linear trend, leaving
+\begin{equation}
+Y_c = Y-s_t
+\end{equation}
+The seasonal component is then removed by fitting harmonic components using least squares. Given the least-squares process
+\begin{equation}Y_c = Y-s_t\hat{\beta}\label{eq:deseas}\end{equation}
+for 
+$$\hat{\beta} = \frac{s'_ts_t}{s'_tY}$$
+we fit
+\begin{equation}
+s_t = \left[1 \cos\left(\frac{2\pi}{365}\left[\begin{matrix}1 \\ \vdots \\ t\end{matrix}\right][1 \hdots \lambda]\right) \sin\left(\frac{2\pi}{365}\left[\begin{matrix}1 \\ \vdots \\ t\end{matrix}\right][1 \hdots \lambda]\right) \right]
+\end{equation}
+for length of (daily) time series $t$ and number of harmonics to be removed $\lambda$. In the general process for daily time series used in this project, $\lambda = 12$, and for 30-year time series, $t = 10950$. Subtracting $s_t\hat{\beta}$ from equation \ref{eq:deseas} above results in $Y_c$ now representing the detrended, deseasonalized, variable component of the time series, ready to be further analyzed. 
+
+\subsubsection{Monthly Data} %Monthly Data
+Monthly data was deseasonalized by taken the simple average of each month over the length of each time series and subtracting it from every data month. $Y_c$, the deseasonlized time series $Y$ over $T$ years, was constructed as follows: 
+\begin{equation}
+Y_c(y,m) = Y(y,m) - \frac{1}{T}\sum_{y=1}^T Y(y,m)
+\end{equation}
+for each month $m$ and year $y$.
+
+\subsection{Spectral Analysis} %%% Spectral Analysis
+\label{sec:spec_analysis}
+%Appendix spectral analysis math
+The autocorrelation function for a stationary process $x(t)$ with mean $\mu=0$ and variance $\sigma^2$ is given by
+$$\begin{aligned}
+R(\tau) &= \frac{1}{\sigma^2}E[(x_t-\mu)(x_{t+\tau}-\mu)] \\
+R(\tau) &= \frac{1}{\sigma^2}E[x_tx_{t+\tau}] \end{aligned}$$
+and is periodic at the same period as the original function $x(t)$. Peaks in $R(\tau)$ correspond to periodicites with frequencies $\tau$ - the autocorrelation function finds interior periodicites in the original time series. By the Wiener-Khinchin Theorem, the autocorrelation function makes a Fourier Pair with the power spectral density $S_{xx}(\omega)$ as follows: 
+$$S_{xx}(\omega) = \int_{-\infty}^\infty R(\tau)e^{-i\omega \tau}d\tau$$
+The absolute value of the Fourier Transform as a function of frequency gives the amount of that frequency that is present in the original function, in this case $R(\tau)$. Therefore the (infinite) sum of the Fourier transforms over a range of frequencies gives the contribution of those frequencies to the autocorrelation, which gives how strongly different frequency patterns show up in the time series. In other words, 
+\begin{equation} \begin{aligned} \int_{\omega_1}^{\omega_2}S_{xx}(\omega)d\omega &= \frac{1}{T}\int_{\omega_1}^{\omega_2}\abs{\hat{x}(\omega)}^2d\omega \\
+&= \text{contribution to power by }\omega\in[\omega_1,\omega_2]\label{eq:FT_power}\end{aligned}\end{equation}
+Now, taking the sample variance of a discrete stationary time series $x$ of length $N$ with mean $\mu=0$,
+$$ \begin{aligned}
+\sigma^2 &\equiv \frac{1}{N}\sum^N_{i=1}(x_i-\mu)^2 \\ 
+\sigma^2 &= \frac{1}{N}\sum^N_{i=1}(x_i)^2 \end{aligned}$$
+and assuming an infinite time series ($N\rightarrow \infty$), we see that the variance of a time series is related to its average power $\bar{P}$ over the domain $[-T,T]$ through
+$$\sigma^2 = \lim_{N\rightarrow\infty}\frac{1}{N}\sum^N_{i=1}(x_i)^2\rightarrow \lim_{T\rightarrow \infty}\frac{1}{2T}\int^T_{-T}x(t)^2dt = \bar{P}$$
+Using Parceval's theorem, which states
+$$\int_{-\infty}^{\infty}\abs{x(t)}^2dt = \int_{-\infty}^{\infty}\abs{\hat{x}(\omega)}^2d\omega$$
+for the Fourier transform $\hat{x}(f)$ of $x(t)$, we can see that 
+$$\frac{1}{2T}\int_{-\infty}^{\infty}\abs{\hat{x}(\omega)}^2d\omega = \frac{1}{T}\int_{0}^{\infty}\abs{\hat{x}(\omega)}^2d\omega= \sigma^2$$
+Combining this expression with equation \ref{eq:FT_power} above, 
+\begin{equation} 
+\frac{1}{T}\int_{\omega_1}^{\omega_2}\abs{\hat{x}(\omega)}^2d\omega = \sigma^2\{\omega\in[\omega_1,\omega_2]\}
+\end{equation}
+with the standard deviation contained in those frequencies simply given by the square root of the expression, 
+\begin{equation}
+\sigma(\vec{\omega})\equiv\sigma\{\omega\in[\omega_1,\omega_2]\} = \sqrt{\frac{1}{T}\int_{\omega_1}^{\omega_2}\abs{\hat{x}(\omega)}^2d\omega}
+\end{equation}
+
+
+
+\end{document}  

@@ -255,11 +255,17 @@ The following are several functions designed to give linear indices of pixels th
 These two forms allow for both getting the linear indices of pixels that match the criteria determined through \texttt{clip\_*} (\textbf{idx\_clipped}) or the linear indices of pixels that do not match the same criteria (\textbf{idx\_unclipped}). In the latter case, an existing vector of `unclipped' indices \textbf{idxs} should be added (can be an empty vector, see individual function headers for a more detailed description). 
 
 \subsubsection{Clipping data by region}
+\begin{figure}[h] %% Regions Map
+\centering
+	\includegraphics[width=19pc,angle=0]{RegionsMap.pdf}\\
+	\caption{Map of regions used in \texttt{clip\_region.m}}\label{fig:regions_map}
+\end{figure}
+
 \texttt{clip\_region.m} allows the return of (linear) indices of an array of points lying within a geographic region or multiple regions. The basic function call is:
 \begin{equation}
 \textbf{idx\_clipped} = \texttt{clip\_region(region\_id,model,lat,lon)}
 \end{equation}
-The information needed to set region boundaries is found in the file \texttt{regions.mat} in the basic code folder. This file contains a struct \textbf{Regions}, containing a lat/lon bounding box (the fields \textbf{lon\_min}, \textbf{lon\_max},\textbf{lat\_min}, \textbf{lat\_max}), whether the region is land or ocean (the field \textbf{Type} = \texttt{`LAND'}, \texttt{`OCEAN'}, or \texttt{`LAND'}), and a short ID and long name for the region (the fields \textbf{ID} and \textbf{Name}). Each `region' is defined as points lying within a lat/lon bounding box, and potentially limited to just land or ocean pixels. More regions can be added by editing the struct \textbf{Regions}. The existing regions are those used in the \cite{} [CASTRUCCIO] (see Figure \ref{} [FIGURE]). 
+The information needed to set region boundaries is found in the file \texttt{regions.mat} in the basic code folder. This file contains a struct \textbf{Regions}, containing a lat/lon bounding box (the fields \textbf{lon\_min}, \textbf{lon\_max},\textbf{lat\_min}, \textbf{lat\_max}), whether the region is land or ocean (the field \textbf{Type} = \texttt{`LAND'}, \texttt{`OCEAN'}, or \texttt{`LAND'}), and a short ID and long name for the region (the fields \textbf{ID} and \textbf{Name}). Each `region' is defined as points lying within a lat/lon bounding box, and potentially limited to just land or ocean pixels. More regions can be added by editing the struct \textbf{Regions}. The existing regions are those used by \cite{castruccio_statistical_2013} (see Figure \ref{fig:regions_map}). 
 
 The lat/lon grid does \textit{not} have to be global. Indices will be returned based on the inputted lat/lon grid.
 
@@ -319,6 +325,10 @@ The following shows an example code run from start to finish analyzing the relat
 \end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{ieeetr}
+\bibliography{paper_cites_mkii.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
 \section{Conventions, Names, etc. Typically Found in Model-World}
 \subsection{Typical Model Experiments}
@@ -342,11 +352,14 @@ The following shows an example code run from start to finish analyzing the relat
 See the Software Architecture of Climate Models. 
 \begin{figure}[h]
 \includegraphics[width=\textwidth]{Knutti_family_tree.png}
-\caption{Figure and following caption copied from \ref{knutti_climate_2013}: (a) The model ``family tree" from CMIP3 and CMIP5 (marked with asterisks) control climate plus observations (ERA40/GPCP and NCEP/CMAP), shown as a dendrogram (a hierarchical clustering of the pairwise distance matrix for temperature and precipitation fields, see text). Some of the models with obvious similarities in code or produced by the same institution are marked with the same color. Models appearing in the same branch are close, and similarity is larger the more to the left the branches separate (for a detailed description of the method, see Masson and Knutti [2011]). (b) Same but based on the predicted change in temperature and precipitation fields for the end of the 21st century in the RCP8.5 scenario relative to the control.}
+\caption{Figure and following caption copied from \cite{knutti_climate_2013}: (a) The model ``family tree" from CMIP3 and CMIP5 (marked with asterisks) control climate plus observations (ERA40/GPCP and NCEP/CMAP), shown as a dendrogram (a hierarchical clustering of the pairwise distance matrix for temperature and precipitation fields, see text). Some of the models with obvious similarities in code or produced by the same institution are marked with the same color. Models appearing in the same branch are close, and similarity is larger the more to the left the branches separate (for a detailed description of the method, see Masson and Knutti [2011]). (b) Same but based on the predicted change in temperature and precipitation fields for the end of the 21st century in the RCP8.5 scenario relative to the control.}
 \end{figure} 
 
 
 \section{Math stuff}
+High- (i.e.\ the pattern of rain showers) and low-frequency (i.e.\ droughts, extreme precipitation events) patterns of precipitation are affected by different climatological processes, and could therefore react differently to changes in temperature and gas concentrations in addition to having differing impacts on human society. To isolate changes in variability for different precipitation processes, we use spectral density analysis to study variability in different frequency `bands' by decomposing the time series for each model output pixel into it frequency components. To do so, we largely adapt the methodology introduced in \cite{leeds_simulation_2015} and \cite{klavans_influence_2016} based on integrations over power spectra.
+
+Spectral density calculations assume stationarity in the underlying time series, so we first detrend the climatic data. We isolate non-seasonal variability by several data frequency-based deseasonalization methods. Finally, we calculate band-separated variability from power spectra. 
 %Appendix deseasonalization math
 \subsection{Detrending and Deseasonalization} %%% Detrending, Deseasonalization
 \label{sec:detrend_deseas}
@@ -417,14 +430,13 @@ Given the time series representing precipitation at a single pixel for one exper
 
 Variability contributed by different frequency bands were calculated as above for each run. Then, for each run, the ratio of future / past variability for each frequency band was taken. The standard deviation across runs for this ratio was taken for each frequency band. If the outputted final value of that ratio is within two standard deviations as so calculated of 1 (no change), then the change in variability for that pixel is not considered meaningful. 1200 runs are used by default. 
 
-\section{Appendix on Frequently Used Input Terms}
+\section{Frequently Used Input Terms}
 
 \begin{description}
 \item [expArray] a cell array of ...
 \item [log] (in a function header) logical 0/\texttt{false} or 1/\texttt{true}
 \item [cell] (in a function header) a cell array of strings, numbers, etc.\ (e.g.\ \texttt{\{`rcp85',\dots\}})
 \end{description}
-
 
 
 
