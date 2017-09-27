@@ -2,17 +2,31 @@ function Saves(VarIndices,modelArray,varargin)
 % SAVES     Extract data from netCDF files (CMIP5 standard conventions)
 %           into .mat files
 %
-%   SAVES(VarIndices,modelArray) extracts 31 years of data from netCDF
+%   SAVES(VarIndices,modelArray) extracts 31 years of data from NetCDF
 %   files saved in [raw_data_dir]/[model]/ containing data for
 %   each variable and model given by [VarIndices] and [modelArray]. 30
 %   years are saved in [proc_data_dir]/[model]/, 31 years are
 %   saved in [proc_data_dir]/[model]/[season_dir]/. The general
 %   form of each saved file (for a 3-dimensional variable reported over
 %   lat, lon, and time) includes a variable [Raw] with the nlon x nlat x
-%   time time series of the desired variable and variables [lon] and [lat]
-%   giving the longitude and latitude values for the variable.
+%   time time series of the desired variable, variables [lon] and [lat]
+%   giving the longitude and latitude values for the variable, and
+%   variables [lon_bnds] and [lat_bnds] giving the extent of the pixels in
+%   for the geographic grid. 
 %
 %   (All directories mentioned above are set by various_defaults)
+%
+%   SAVES searches for the primary variable given by the row index of
+%   Varnames.csv inputted as [VarIndices]. If the primary variable name (or
+%   'lat', 'lon', 'lat_bnds', or 'lon_bnds') is not found in the original
+%   NetCDF file, the program run is interrupted and the available variables
+%   are shown, allowing the user to manually pick which variable to assign
+%   to 'Raw', 'lat', 'lon', 'lat_bnds', or 'lon_bnds', or to interrupt
+%   (skip) the program run. This is to take into account file conventions
+%   in which the variables were saved with incorrect or out of convention
+%   filenames. If the difference in filename is known from the start, the
+%   program can be set to specifically look for that different filename
+%   (see flags below). 
 %
 %   LEAP YEARS: SAVES removes the 366th day from any leap year (by
 %   gregorian or julian leap year standards, for corresponding leap year
@@ -24,6 +38,11 @@ function Saves(VarIndices,modelArray,varargin)
 %
 %   SUPPORTED DATA FREQUENCIES: daily (including cfDay, etc.), monthly
 %   (including Amon, Lmon, etc.)
+%
+%   SUPPORTED/EXPECTED NETCDF FILENAME CONVENTION:
+%       [filevar]_[freq]_[model]_[exp]_[run]_[startdate]_[enddate].nc
+%   with [startdate] and [enddate] being either YYYYMM (monthly data) or 
+%   YYYYMMDD (daily data)
 %
 %   SAVES is designed to minimize memory usage in MATLAB, and by default
 %   extracts the minimum required for the desired time series length from
@@ -50,7 +69,7 @@ function Saves(VarIndices,modelArray,varargin)
 %                                 end of the group of netcdf files and save
 %                                 in a _DATA.mat file, by default 30.
 %                                 Second integer is how many years to save
-%                                 into thes seasonal directory; if left
+%                                 into the seasonal directory; if left
 %                                 empty, the additional file is not
 %                                 created.
 %       'year_range',[int],[int]- manually choose start and end years for
@@ -61,6 +80,10 @@ function Saves(VarIndices,modelArray,varargin)
 %       'save_case',[char]      - choose to only save standard saves or
 %                                 only alt (seasons by def) saves, through
 %                                 'std', 'alt', or 'all'
+%       'skip_bounds',[log]     - whether to save/look for lat/lon bounds
+%                                 in the netcdf file (def: true) - use if
+%                                 the netcdf files don't have pixel bounds
+%                                 saved
 %       'testing'               - adds '_TEST' to filename (after replace
 %                                 testing, so code does not look for
 %                                 '_TEST' file to replace)
@@ -84,9 +107,28 @@ function Saves(VarIndices,modelArray,varargin)
 %                                 formats (hint, v7 isn't usually useful,
 %                                 but v6 may be)).
 %
+%       DEALING WITH DIFFERENT VARIABLE NAMING CONVENTIONS INSIDE NC FILES
+%           'variable',[char]   - manually set the variable name to look
+%                                 for in the source NetCDF file. By
+%                                 default, the program looks for the
+%                                 variable name set in Varnames.csv through
+%                                 the input [VarIndices]. 
+%           'lat_name',[char]   - manually set the name of the latitude
+%                                 array. By default, the program looks for
+%                                 'lat'. 
+%           'lon_name',[char]   - manually set the name of the longitude
+%                                 array. By default, the program looks for
+%                                 'lon'. 
+%           'lat_bnds_name',[char]  - manually set the name of the latitude
+%                                     band array. By default, the program 
+%                                     looks for 'lat_bnds'
+%           'lon_bnds_name',[char]  - manually set the name of the
+%                                     longitude band array. By default, the
+%                                     program looks for 'lon_bnds'
+%       NOTE: these above 5 flags are only supported with one variable
+%       inputted (so length(VarIndices) == 1).
 %
 %   Saving convention:
-%   [filevar]_[freq]_[model]_[exp]_[run]_[strtyr]_[endyr]_DATA.mat
 %   [filevar]_[freq]_[model]_[exp]_[run]_[strtyr]_[endyr]_DATA.mat
 %
 %   NOTE: this function is part of the /project/moyer/ climate data file
@@ -96,7 +138,7 @@ function Saves(VarIndices,modelArray,varargin)
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last modified 06/22/2016
+%   Last modified 07/25/2016
 
 %% 1 Defaults
 %Get defaults from various_defaults
@@ -107,9 +149,17 @@ years_to_save = 30; save_reg = true;
 years_to_save_alt = 31; save_alt = true;
 alt_folder = various_defaults.season_dir;
 save_log = false;
+skip_bounds = false;
 
 replace_files = true;
 filename_add = [];
+
+%File variable names to search for 
+var_search = [];
+lat_search = []; %#ok<NASGU>
+lon_search = []; %#ok<NASGU>
+lat_bnds_search = []; %#ok<NASGU>
+lon_bnds_search = []; %#ok<NASGU>
 
 %Data conventions
 version = '-v7.3';
@@ -159,6 +209,8 @@ if (~isempty(varargin))
                 else
                     warning('Saves:BadCaseInput',[varargin{in_idx+1},' is not a valid save case. Choose "std" or "alt"']);
                 end
+            case {'skip_bounds'}
+                skip_bounds = varargin{in_idx+1};
             case {'save_log'}
                 save_log = true;
             case {'year_range'}
@@ -170,6 +222,16 @@ if (~isempty(varargin))
                 version = varargin{in_idx+1};
             case {'suffix'}
                 filename_add = varargin{in_idx+1};
+            case {'variable'}
+                var_search = varargin{in_idx+1};
+            case {'lon_name'}
+                lon_search = varargin{in_idx+1}; %#ok<NASGU>
+            case {'lat_name'}
+                lat_search = varargin{in_idx+1}; %#ok<NASGU>
+            case {'lon_bnds_name'}
+                lon_bnds_search = varargin{in_idx+1}; %#ok<NASGU> 
+            case {'lat_bnds_name'}
+                lat_bnds_search = varargin{in_idx+1}; %#ok<NASGU>
         end
     end
 end
@@ -219,7 +281,7 @@ for i = 1:length(VarIndices);
                         '[6]: julian\n'];
                     prompt_str = [prompt_str,'Insert a number to continue with the corresponding variable, or 0 to break.']; %#ok<AGROW>
                     calendars = {'365_day','360_day','gregorian','proleptic_gregorian','no_leap','julian'};
-                    var_id = input(prompt_str);
+                    var_id = input(fprintf(prompt_str));
                     if var_id == 0
                         error('Save:varbreak',['Save run for ',filenameS,' interrupted.'])
                     else
@@ -239,15 +301,17 @@ for i = 1:length(VarIndices);
                 
                 %% 4.3 Decide at which file to begin loading data
                 %Get the last ending year of data for this var, model, exp
-                %contained in filesystem (over arbitrary number of .nc files)
+                %contained in filesystem (over arbitrary number of .nc
+                %files), assuming date form of YYYY*, but also supporting
+                %year-only dates of the form Y{1,4}.
                 yrrSplit_end = regexp(date_ranges{num_files},delim3,'split');
-                enddate = yrrSplit_end{2}; files_endyr = str2double(enddate(1:4));
+                enddate = yrrSplit_end{2}; files_endyr = str2double(enddate(1:min(length(yrrSplit_end{2}),4)));
                 
                 %Get start years of each .nc file for this var, model, exp
                 file_strtyrs = zeros(num_files,1);
                 for f = 1:num_files;
                     yrrSplit_strt = regexp(date_ranges{f},delim3,'split');
-                    file_strtyrs(f) = str2double(yrrSplit_strt{1}(1:4));
+                    file_strtyrs(f) = str2double(yrrSplit_strt{1}(1:1:min(length(yrrSplit_strt{1}),4)));
                 end
                 %Get index of the file with the latest startdate that still
                 %allows the full desired data length to be extracted
@@ -264,7 +328,7 @@ for i = 1:length(VarIndices);
                 %Set files start date from index found above to minimize
                 %imported files
                 yrrSplit_strt = regexp(date_ranges{first_file},delim3,'split');
-                strtdate = yrrSplit_strt{1}; files_strtyr = str2double(strtdate(1:4));
+                strtdate = yrrSplit_strt{1}; files_strtyr = str2double(strtdate(1:min(length(yrrSplit_strt{1}),4)));
                 
                 %Truncate filenames to just those needed
                 run = run(first_file:end);
@@ -273,7 +337,7 @@ for i = 1:length(VarIndices);
                 
                 %Set last file startdate
                 yrrSplit_strt = regexp(date_ranges{num_files},delim2,'split');
-                strtdate = yrrSplit_strt{1}; last_strtyr = str2double(strtdate(1:4));
+                strtdate = yrrSplit_strt{1}; last_strtyr = str2double(strtdate(1:min(length(yrrSplit_strt{1}),4)));
                 
                 %% 4.4 Get start / end indices for desired data length
                 %Get number of data points in a year
@@ -311,7 +375,13 @@ for i = 1:length(VarIndices);
                 end
                 
                 %Process irregular start times
-                if (~isempty(strfind(freq,'day')) && strcmp(strtdate(5:8),'0101')) || (isempty(strfind(freq,'day')) && strcmp(strtdate(5:6),'01'))
+                if length(strtdate)<5
+                    sub_startbias = 0;
+                    warning('SAVES:ShortDate',['The start date of the time series for ',...
+                        ' implied by the filename is less than 5 characters long, suggesting it is of the format Y{1-4}. ',...
+                        'Accordingly, it is assumed the time series starts on January 1st / January / etc., and the "startbias" ',...
+                        '(the number of timesteps skipped to correct for non-traditional start dates) is set to 0. Please verify if that feels fishy.'])
+                elseif (~isempty(strfind(freq,'day')) && strcmp(strtdate(5:8),'0101')) || (isempty(strfind(freq,'day')) && strcmp(strtdate(5:6),'01'))
                     sub_startbias = 0;
                 else
                     if strfind(freq,'day')>0 %Daily data
@@ -361,6 +431,7 @@ for i = 1:length(VarIndices);
                 if year_startbias < 0 
                     error('Saves:FilesTooShort',['Though ',num2str(cust_file_strtyr),' is desired as a first year for processed data, saved netCDF files only begin at ',num2str(files_strtyr),'. Please pick a later start year or use default settings.'])
                 end
+                
                 %% 4.5 Define final (to save) filenames
                 %Since year_startbias lists the number of complete years to
                 %skip, the filename needs to take into account the first
@@ -399,10 +470,44 @@ for i = 1:length(VarIndices);
                 if calc
                     %% 4.7.1 Define dimension counts and indexes
                     file_info = ncinfo([various_defaults.raw_data_dir,modelArray{j},'/',filevar,freq,modelArray{j},'_',expArray{experiment},'_',run{1},'_',date_ranges{1},'.nc']);
+                    %Make sure the filevar exists in the nc files
+                    %(interior_var is the variable name on the "interior"
+                    %of the file, as opposed to filevar, which is the
+                    %variable name in the filename. These shouldn't be
+                    %different, but occasionally are). 
+                    if isempty(var_search)
+                        if ~isempty(structfind(file_info.Variables,'Name',filevar))
+                            interior_var = filevar; %interior_var = 
+                        else
+                            prompt_str = ['The variable "',filevar,'" was not found in ',...
+                                various_defaults.raw_data_dir,modelArray{j},'/',FileNames(1).name,...
+                                '. Please manually select one of the following variables to load by inserting the corresponding integer:\n'];
+                            for nc_var_idxs = 1:length(file_info.Variables);
+                                prompt_str = [prompt_str,'[',num2str(nc_var_idxs),']: ',file_info.Variables(nc_var_idxs).Name,'\n']; %#ok<AGROW>
+                            end
+                            prompt_str = [prompt_str,'Insert a number to continue with the corresponding variable, or 0 to break. ',...
+                                'If this program is being run with many variables / models, I suggest breaking the code run and ',...
+                                're-running with the flag "variable" set to the variable name actually present in the file to avoid ',...
+                                'having to sit by this program while it is interrupted every time it runs into this model ',...
+                                '(note: this flag only works with one variable and set of models with the same unconventional variable naming scheme at a time).']; %#ok<AGROW>
+                            var_id = input(fprintf(prompt_str));
+                            if var_id == 0
+                                error('Save:varbreak',['Save run for ',filenameS,' interrupted.'])
+                            else
+                                interior_var = file_info.Variables(var_id).Name;
+                            end
+                        end
+                    else
+                        %If specifying a file-interior variable name, set
+                        %program to search for it. 
+                        interior_var = var_search;
+                    end
+                    
                     %Get number of dimensions (lat, lon, time, etc.) for var
-                    var_size = file_info.Variables(structfind(file_info.Variables,'Name',filevar)).Size;
+                    var_size = file_info.Variables(structfind(file_info.Variables,'Name',interior_var)).Size;
+                    
                     %Get which dimension of the variable in the netcdf is time
-                    time_dim = structfind(file_info.Variables(structfind(file_info.Variables,'Name',filevar)).Dimensions,'Name','time');
+                    time_dim = structfind(file_info.Variables(structfind(file_info.Variables,'Name',interior_var)).Dimensions,'Name','time');
                     
                     %Get base count starts and ends (ones = from beginning of
                     %that dimension in file, inf = till end of that dim)
@@ -418,7 +523,7 @@ for i = 1:length(VarIndices);
                     %elevation/other desired fourth dimension variable and
                     %insert it into count var
                     if ~isempty(dim4_val)
-                        dim4_idx = structfind(file_info.Variables(structfind(file_info.Variables,'Name',filevar)).Dimensions,'Name',dim4);
+                        dim4_idx = structfind(file_info.Variables(structfind(file_info.Variables,'Name',interior_var)).Dimensions,'Name',dim4);
                         idx_strt1(dim4_idx) = dim4_val;
                         idx_strtf(dim4_idx) = dim4_val;
                         idx_count1(dim4_idx) = 1;
@@ -439,7 +544,7 @@ for i = 1:length(VarIndices);
                         idx_count1 = idx_countf;
                     end
                     
-                    %% 4.7.2 Load data
+                    %% 4.7.2 Load variable data
                     %Pre-allocate cells
                     filename = cell(num_files,1);
                     Raw = cell(num_files,1);
@@ -460,10 +565,8 @@ for i = 1:length(VarIndices);
                     
                     %Convert into matrix
                     Raw = cat(time_dim,Raw{:});
-                    
-                    %Load lat/lon coordinates
-                    lat = ncread(filename{1},'lat'); %#ok<NASGU>
-                    lon = ncread(filename{1},'lon'); %#ok<NASGU>
+                    %Add Raw to output struct
+                  
                     
                     %% 4.7.3 Process Leap Years, if necessary (by removing leap-added day from end of that year)
                     idxs_tmp = cell((files_endyr-files_strtyr-year_startbias),1);
@@ -489,40 +592,84 @@ for i = 1:length(VarIndices);
                     %Clip out leap-added days
                     Raw = Raw(idxs{:});
                     
-                    %% 4.7.4 Save files
                     %Remove singleton dimensions (i.e. set 4th dim
                     %elevation)
                     Raw = squeeze(Raw);
                     
+                    %% 4.7.4 Load Geographic Variables 
+                    %Load latitude, longitude, latitude bounds, and
+                    %longitude bounds, with support for files in which
+                    %these are not called lat, lon, lat_bnds, and lon_bnds,
+                    %respectively
+                    if skip_bounds
+                        aux_vars = {'lat','lon'};
+                    else
+                        aux_vars = {'lat','lon','lat_bnds','lon_bnds'};
+                    end
+                    for aux_var_idx = 1:length(aux_vars);
+                        if isempty(var_search)
+                            if ~isempty(structfind(file_info.Variables,'Name',aux_vars{aux_var_idx}))
+                                outputs.(aux_vars{aux_var_idx}) = ncread(filename{1},aux_vars{aux_var_idx});
+                            else
+                                prompt_str = ['The variable "',aux_vars{aux_var_idx},'" was not found in ',...
+                                    various_defaults.raw_data_dir,modelArray{j},'/',FileNames(1).name,...
+                                    '. Please manually select one of the following variables to load as "',aux_vars{aux_var_idx},'" by inserting the corresponding integer:\n'];
+                                for nc_var_idxs = 1:length(file_info.Variables);
+                                    prompt_str = [prompt_str,'[',num2str(nc_var_idxs),']: ',file_info.Variables(nc_var_idxs).Name,'\n']; %#ok<AGROW>
+                                end
+                                prompt_str = [prompt_str,'Insert a number to continue with the corresponding variable, or 0 to break. ',...
+                                    'If this program is being run with many variables / models, I suggest breaking the code run and ',...
+                                    're-running with the flag "',aux_vars{aux_var_idx},'_name" set to the variable name actually present in the file to avoid ',...
+                                    'having to sit by this program while it is interrupted every time it runs into this model ',...
+                                    '(note: this flag only works with one variable and set of models with the same unconventional variable naming scheme at a time).']; %#ok<AGROW>
+                                var_id = input(fprintf(prompt_str));
+                                if var_id == 0
+                                    error('Save:varbreak',['Save run for ',filenameS,' interrupted.'])
+                                else
+                                    outputs.(aux_vars{aux_var_idx}) = ncread(filename{1},file_info.Variables(var_id).Name);
+                                end
+                            end
+                        else
+                            %If specifying a file-interior variable name, set
+                            %program to search for it.
+                            outputs.(aux_vars{aux_var_idx}) = ncread(filename{1},eval([aux_vars{aux_var_idx},'_search']));
+                        end
+                    end
+                    
+                    %% 4.7.5 Output struct?
+                    outputs.Raw = Raw; clear Raw
+                    
+                    %% 4.7.6 Save files
                     %Save longer time series
                     if years_to_save_alt >= years_to_save && calc_alt
-                        save([filename_alt,filename_add],version,'lat','lon','Raw');
-                        disp([filename_alt,filename_add,version,' saved'])
+                        save([filename_alt,filename_add],'-struct','outputs',version)
+                        disp([filename_alt,filename_add,' ',version,' saved'])
                         calc_alt = false; %make sure not saved twice
                     elseif calc_reg
-                        save([filenameS,filename_add],version,'lat','lon','Raw');
-                        disp([filenameS,filename_add,version,' saved'])
+                        save([filenameS,filename_add],'-struct','outputs',version)
+                        disp([filenameS,filename_add,' ',version,' saved'])
                         calc_reg = false; %make sure not saved twice
                     end
                     
                     %Prune idxs down to smaller of two save conditions
                     % THIS SHOULD BE CHANGED, CURRENTLY ASSUMES RAW HAS 3
                     % DIMENSIONS< WHICH IS NOT ALWAYS THE CASE
-                    idxs_tmp = abs(years_to_save_alt-years_to_save)*subyear_units+1:size(Raw,3);
-                    idxs = cell(ndims(Raw),1);
-                    for dim = 1:length(Raw)
-                        idxs{dim} = 1:size(Raw,dim);
+                    idxs_tmp = abs(years_to_save_alt-years_to_save)*subyear_units+1:size(outputs.Raw,3);
+                    idxs = cell(ndims(outputs.Raw),1);
+                    for dim = 1:length(outputs.Raw)
+                        idxs{dim} = 1:size(outputs.Raw,dim);
                     end
                     idxs{3} = idxs_tmp;
-                    Raw = Raw(idxs{:}); %#ok<NASGU>
+                    outputs.Raw = outputs.Raw(idxs{:});
+
                     
                     %Save shorter time series
                     if years_to_save >= years_to_save_alt && calc_alt
-                        save([filename_alt,filename_add],version,'lat','lon','Raw');
-                        disp([filename_alt,filename_add,version,' saved'])
+                        save([filename_alt,filename_add],'-struct','outputs',version)
+                        disp([filename_alt,filename_add,' ',version,' saved'])
                     elseif calc_reg
-                        save([filenameS,filename_add],version,'lat','lon','Raw');
-                        disp([filenameS,filename_add,version,' saved'])
+                        save([filenameS,filename_add],'-struct','outputs',version)
+                        disp([filenameS,filename_add,' ',version,' saved'])
                     end
                     
                     %Store success message in log

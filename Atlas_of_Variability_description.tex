@@ -40,7 +40,7 @@ The ``Atlas of Variability'' is a project by the Center for Robust Decision-Maki
 
 Variability in this context is explicitly defined as the portion of the standard deviation contributed by patterns with frequencies within a defined range. Generally, this is interpreted to mean non-seasonal variability - the seasonal component is removed from the time series before processing. 
 
-The data is hosted using the Globus data publishing system. The collection is permanently stored at \url{https://publish.globus.org/jspui/handle/11466/102}. To access the data, you must join the RDCEP Globus Publication Users group, with instructions in the Globus interface. 
+The data is hosted using the Globus data publishing system. The collection is permanently stored at \url{https://publish.globus.org/jspui/handle/11466/102}. To access the data, you must join the RDCEP Globus Publication Users group, with instructions on how to do so to be found in the Globus interface. 
 
 Output from the ``Atlas of Variability'' has so far been used in \cite{moyer_2017_changes}, \cite{schwarzwald_2017_temperature}, etc.
 
@@ -77,7 +77,7 @@ Files are named according to the following convention:
 \end{equation}
 \begin{description}
 \item [file variable identifier] shorthand variable name, e.g.\ \texttt{pr} for precipitation
-\item [data frequency] month, day, etc., using CMIP5 conventions (\_Amon / \_Lmon / \_Omon for month, for whatever reason)
+\item [data frequency] month, day, etc., using CMIP5 conventions (this includes, for example, the \_Amon / \_Lmon / \_Omon conventions for monthly data)
 \item [model] model name in UNIX-safe character convention (so CSIRO-Mk3.6.0 becomes CSIRO-Mk3-6-0)\footnote{Occasionally, models are listed in lowercase because their original files in the CMIP5 archive were saved as such; e.g.\ `bcc-csm1-1' for BCC-CSM 1.1.} 
 \item [experiment] experiment / forcing profile, e.g.\ RCP8.5
 \item [run] run ID (in CMIP5, [r\#i\#p\#] for run number, iteration, and microphysics; for non-CMIP5, can be anything)
@@ -104,7 +104,7 @@ In addition to frequency-separated variability, some more basic statistical prop
 The geographic grid is given by 4 variables - \texttt{lat}, \texttt{lon}, \texttt{lat\_bnds}, and \texttt{lon\_bnds}. \texttt{lat} and \texttt{lon} identify the coordinate of each pixel, and can either be 1-dimensional vectors (rectangular grids), or 2-dimensional arrays (variable grids, etc.). \texttt{lat\_bnds} and \texttt{lon\_bnds} are arrays with one more dimension (of size 2) than the \texttt{lat} and \texttt{lon} variables, giving the minimum and maximum values of \texttt{lat} and \texttt{lon} that constitute the vertices of the relevant pixel. These variables have \texttt{long\_name} and \texttt{units} attributes as above. 
 
 \subsection{Notes on File Construction}
-This dataset keeps CMIP5 naming conventions whenever possible for variable names, units, and saving conventions (yes, this includes saving precipitation in $kg/m^2s$). For more information on variable names, units, and saving conventions, please see the files on the CMIP5 guide page \href{http://cmip-pcmdi.llnl.gov/cmip5/guide_to_cmip5.html}{\underline{here}} (especially the \texttt{standard\_output} files). For more information on experiment design, please see the files on the CMIP5 Experiment Design Page \href{http://cmip-pcmdi.llnl.gov/cmip5/experiment_design.html}{\underline{here}}. 
+This dataset keeps CMIP5 naming conventions whenever possible for variable names, units, and saving conventions (including saving precipitation in $kg/m^2s$). For more information on variable names, units, and saving conventions, please see the files on the CMIP5 guide page \href{http://cmip-pcmdi.llnl.gov/cmip5/guide_to_cmip5.html}{\underline{here}} (especially the \texttt{standard\_output} files). For more information on experiment design, please see the files on the CMIP5 Experiment Design Page \href{http://cmip-pcmdi.llnl.gov/cmip5/experiment_design.html}{\underline{here}}. 
 
 All time series used have 365-day years. For models using gregorian/leap year calendars, the 366th day of each leap year was removed before statistics were calculated. 
 

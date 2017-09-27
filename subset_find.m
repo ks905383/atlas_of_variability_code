@@ -18,8 +18,8 @@ function [lat_idxs,lon_idxs] = subset_find(lat,lon,lat_alt,lon_alt)
 %                 c3 c4
 %                 d3 d4
 %       SUBSET_FIND(lat,lon,lat_alt,lon_alt) would return 
-%           lat_idxs = [2:4];
-%           lon_idxs = [3:4];
+%           lat_idxs = [2 3 4];
+%           lon_idxs = [3 4];
 %
 %   Sample uses: if (for, say a climate model) a nlon x nlat array of area
 %   weights exists for a global grid, but some quantity is saved on only a

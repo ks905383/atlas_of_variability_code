@@ -46,6 +46,42 @@ function varargout = name_chars(model,expArray,filevar,freq,varargin)
 %                              default '/Seasons_DS6'/). Setting season to
 %                              'all' does not change the running of the
 %                              program.
+%       'start_year',[num/cell] - searches for a specific start year
+%                                 (specifically from the first portion the
+%                                 next part of the CMIP5 standard filename
+%                                 after the [run] slot). By default is set
+%                                 to [] (not searched for). If more than
+%                                 one set of file characteristics is
+%                                 outputted, this can be a cell array (in
+%                                 which case each element corresponds to
+%                                 searching for each set of file
+%                                 characteristics); otherwise it is assumed
+%                                 the desired start year is the same for
+%                                 both.
+%       'end_year',[num/cell]   - searches for a specific end year
+%                                 (specifically from the last portion the
+%                                 next part of the CMIP5 standard filename
+%                                 after the [run] slot). By default is set
+%                                 to [] (not searched for). If more than
+%                                 one set of file characteristics is
+%                                 outputted, this can be a cell array (in
+%                                 which case each element corresponds to
+%                                 searching for each set of file
+%                                 characteristics); otherwise it is assumed
+%                                 the desired end year is the same for
+%                                 both.
+%       'run',[str/cell]        - also searches for a specific run
+%                                 (specifically the next part of the CMIP5
+%                                 standard filename after the [experiment]
+%                                 slot. By default is set to [], an empty
+%                                 string, and is therefore not explicitly
+%                                 searched for). If more than
+%                                 one set of file characteristics is
+%                                 outputted, this can be a cell array (in
+%                                 which case each element corresponds to
+%                                 searching for each set of file
+%                                 characteristics); otherwise it is assumed
+%                                 the desired run is the same for both.
 %       'file_end',[str]     - searches for files that end in '[str].mat'
 %                              instead of default '*DATA.mat'.
 %       'match_length',[log] - set whether to attempt to match length of
@@ -78,12 +114,17 @@ function varargout = name_chars(model,expArray,filevar,freq,varargin)
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last modified 03/08/2017
+%   Last modified 07/21/2017
 
+various_defaults = matfile('various_defaults.mat');
 diff_directory = false;
 use_convention = ones(1,length(expArray));
 file_end = '*DATA.mat'; cust_file_end = false;
-season = 'all'; season_folder = '/Seasons_DS6/';
+season = 'all'; season_folder = various_defaults.season_dir;
+run_set_tmp = [];
+strtyr_set_tmp = [];
+endyr_set_tmp = [];
+
 
 %If two experiments, by default attempt to match lengths
 if length(expArray)>=2
@@ -127,6 +168,12 @@ if (~isempty(varargin))
                 file_end = varargin{in_idx+1}; cust_file_end = true;
             case {'match_length'}
                 match_length = varargin{in_idx+1};
+            case {'start_year'} 
+                strtyr_set_tmp = varargin{in_idx+1}; varargin{in_idx+1} = 0;
+            case {'end_year'} 
+                endyr_set_tmp = varargin{in_idx+1}; varargin{in_idx+1} = 0;
+            case {'run'}
+                run_set_tmp = varargin{in_idx+1}; varargin{in_idx+1} = 0;
                 
         end
     end
@@ -140,7 +187,7 @@ delim = strcat(delim1,'|',delim2);
 %Set directory of searching by season
 if strcmp(season,'all')
     seas_dir = '/';
-    main_directory = '/project/moyer/CMIP5_Raw/';
+    main_directory = various_defaults.raw_data_dir;
 else
     seas_dir = season_folder;
     main_directory = '/project/moyer/Kevin/';
@@ -155,6 +202,7 @@ if ~diff_directory
 else
     directory = alt_directory;
 end
+
 %Preallocate arrays
 num_exps = length(expArray);
 yrr = cell(1,num_exps);
@@ -163,7 +211,46 @@ strtyr = cell(1,num_exps);
 endyr = cell(1,num_exps);
 num_conventions = ones(1,num_exps);
 for experiment = 1:num_exps;
-    FileNameSearchString = strcat(directory,filevar,freq,model,'_',expArray{experiment},'_',file_end);
+    %Deal with both cell and individual inputs
+    if isa(strtyr_set_tmp,'cell')
+        strtyr_set = strtyr_set_tmp{experiment};
+    else
+        strtyr_set = strtyr_set_tmp;
+    end
+    if isa(endyr_set_tmp,'cell')
+        endyr_set = endyr_set_tmp{experiment};
+    else
+        endyr_set = endyr_set_tmp;
+    end
+    if isa(run_set_tmp,'cell')
+        %Add underscore to the run name to keep filename stable
+        if ~isempty(run_set_tmp{experiment});
+            run_set = [run_set_tmp{experiment},'_'];
+        else
+            run_set = [];
+        end
+    else
+        if ~isempty(run_set_tmp)
+            run_set = [run_set_tmp,'_']; 
+        else
+            run_set = [];
+        end
+    end
+    
+    %Set year string if desired
+    if isempty(strtyr_set) && isempty(endyr_set)
+        year_set = [];
+    else
+        if isempty(strtyr_set) && ~isempty(endyr_set)
+            year_set = ['*-',num2str(endyr_set)];
+        elseif ~isempty(strtyr_set) && isempty(endyr_set)
+            year_set = ['*',num2str(strtyr_set),'-*'];
+        else
+            year_set = ['*',num2str(strtyr_set),'-*',endyr_set];
+        end
+    end
+    
+    FileNameSearchString = [directory,filevar,freq,model,'_',expArray{experiment},'_',run_set,year_set,file_end];
     FileNames = dir(FileNameSearchString);
     num_conventions(experiment) = length(FileNames);
     if (use_convention(experiment) > num_conventions(experiment)) || use_convention(experiment)==0
@@ -191,7 +278,7 @@ for experiment = 1:num_exps;
         
         if num_conventions(experiment) > 1 && ~match_length
             warn_Msg = ['More than one ',file_end,' file for ',model,' ',expArray{experiment},...
-                ' ',freq,' ',filevar,' found, ',num2str(strtyr{experiment}),'-',num2str(endyr{experiment}),' name characteristics outputted for ',expArray{experiment}];
+                ' ',freq,' ',filevar,' ',run_set,' found, ',num2str(strtyr{experiment}),'-',num2str(endyr{experiment}),' name characteristics outputted for ',expArray{experiment}];
             warning('name_chars:MultConvs',warn_Msg)
         end
     end
@@ -215,7 +302,7 @@ if match_length
                 end
                 conv_try = possible_convs(n,:); %Each row of permutations
                 for experiment = 1:length(expArray) %Redo processing above
-                    FileNameSearchString = strcat(directory,filevar,freq,model,'_',expArray{experiment},file_end);
+                    FileNameSearchString = [directory,filevar,freq,model,'_',expArray{experiment},'_',run_set,year_set,file_end];
                     FileNames = dir(FileNameSearchString);
                     %Get run and timeframe characteristics for file
                     Varstr = FileNames(conv_try(experiment)).name;

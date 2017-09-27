@@ -94,9 +94,9 @@ function varargout = clip_region(region_id,varargin)
 %   Gallegos, Argentina). When in doubt, check the location using (this
 %   uses the custom function base_worldmap.m as well):
 %           [idx_reg] = clip_region([region_id],[model],lat,lon);
-%           [idx_lon,idx_lat] = sub2ind([length(lon) length(lat)],idx_reg);
+%           [idx_lon,idx_lat] = ind2sub([length(lon) length(lat)],idx_reg);
 %           base_worldmap();
-%           scatterm(lat(idx_lat),lon(idx_lat));
+%           scatterm(lat(idx_lat),lon(idx_lon));
 %
 %   NOTE: this function is part of the /project/moyer/ climate data file
 %   ecosystem.

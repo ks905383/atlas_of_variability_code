@@ -799,11 +799,13 @@ for var_idx = VarIndices;
             
             %Load required data for first variable
             Data(1,1).Raw = load_stddevs(var_idx,modelArray{j},expArray{2},season_load,'start_year',strtyr{2},'season_folder',folder_season);
-            Data(2,1).Raw = load_means(var_idx,modelArray{j},expArray{2},season_load,'start_year',strtyr{2},'season_folder',folder_season);
+            Data(2,1).Raw = load_stddevs(var_idx,modelArray{j},expArray{2},season_load,'start_year',strtyr{2},'season_folder',folder_season);
+            Data(2,1).Raw = Data(2,1).Raw(structfind(Data(2,1).Raw,'ID','mean')).Data;
             
             %Load required data for second variable
             Data(1,2).Raw = load_stddevs(var_idx,modelArray{j},expArray{1},season_load,'start_year',strtyr{1},'season_folder',folder_season);
-            Data(2,2).Raw = load_means(var_idx,modelArray{j},expArray{1},season_load,'start_year',strtyr{1},'season_folder',folder_season);
+            Data(2,2).Raw = load_stddevs(var_idx,modelArray{j},expArray{1},season_load,'start_year',strtyr{1},'season_folder',folder_season);
+            Data(2,2).Raw = Data(2,2).Raw(structfind(Data(2,2).Raw,'ID','mean')).Data;
             
             %Load area scaling weights for mean calculations
             filename_w = strcat('/project/moyer/Kevin/Code/GridWeights/',modelArray{j},'_GridWeights');
@@ -818,7 +820,7 @@ for var_idx = VarIndices;
             end
         
             %Get geo array
-            [~,lat,lon] = load_means(var_idx,modelArray{j},expArray{1},season_load,'start_year',strtyr{1},'season_folder',folder_season);
+            [lat,lon] = load_stddevs(var_idx,modelArray{j},expArray{1},season_load,'start_year',strtyr{1},'season_folder',folder_season);
             
             %% 4.3.2.2 Identify Frequency Bands to Plot
             struct_idxs = zeros(numel(Data),1);
@@ -1508,7 +1510,7 @@ for var_idx = VarIndices;
     %% 4.4 Save Stats
     if save_stats
         modelArray = [modelArray_sub{:}];
-        filename_stats = strcat(filename_dir,'Stats/',filename_base,'_stats');
+        filename_stats = strcat(filename_dir,'Stats/',filename_base,'_stats',filename_add);
         if ~isempty(struct_idxs); freq_names{:} = {Data(struct_idxs(1)).Raw(freq_ids(1,:)).Name};
         else freq_names = 'no frequency-dependent data involved';end 
         save(filename_stats,'-v7.3','modelArray','freq_names','CorrCoeffs','slp','mu','y_data_mean','x_data_mean','coeff','explained','xlabel_string','ylabel_string')

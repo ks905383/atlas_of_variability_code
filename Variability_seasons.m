@@ -366,7 +366,7 @@ for i=1:length(VarIndices);
                                 freq_bands = daily_freq_bands(freq_idx,:); num_bands = size(freq_bands,1);
                                 freq_band_names = daily_freq_band_names(freq_idx);
                                 freq_band_ID = daily_freq_band_ID(freq_idx);
-                                XF_size = [365 36500];
+                                XF_size = [365 Inf];
                                 
                                 %Calculate matrix for deseasonalization
                                 X0 = ones(rge,1);
@@ -388,7 +388,7 @@ for i=1:length(VarIndices);
                                 freq_bands = monthly_freq_bands(freq_idx,:); num_bands = size(freq_bands,1);
                                 freq_band_names = monthly_freq_band_names(freq_idx);
                                 freq_band_ID = monthly_freq_band_ID(freq_idx);
-                                XF_size = [12 12000];
+                                XF_size = [12 Inf];
                                 %Pre-allocate FFT'ed and Means Matrices (for computing optimization)
                                 MonAvgs = zeros(nlon,nlat,12);
                                 

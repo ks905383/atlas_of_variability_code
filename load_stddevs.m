@@ -106,7 +106,7 @@ output_filename = false;
 
 %Set season 'all' to be the default version. Based on no other input flags
 %being 'all' or all upper case, but I think that's pretty easy to keep. 
-if ~isempty(varargin) && isa(varargin{1},'character') && (strcmp(varargin{1},'all') || all(isstrprop(varargin{1},'upper')))
+if ~isempty(varargin) && isa(varargin{1},'char') && (strcmp(varargin{1},'all') || all(isstrprop(varargin{1},'upper')))
    season = varargin{1};
    varargin = varargin(2:end);
 else
@@ -125,6 +125,8 @@ if (~isempty(varargin))
                 strtyr_find = varargin{in_idx+1}; varargin{in_idx+1} = 0;
             case {'end_year'}
                 endyr_find = varargin{in_idx+1}; varargin{in_idx+1} = 0;
+            case {'run'} %NOT YET DEVELOPED
+                run_set = varargin{in_idx+1}; varargin{in_idx+1} = 0;
             case {'keep_warnings'}
                 keep_warnings = true;
             case {'property'}

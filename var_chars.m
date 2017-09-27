@@ -90,7 +90,8 @@ if isa(var_idx,'char')
             var_idx = intersect(freq_idx,var_idx_tmp); var_idx = var_idx(1);
         else %if no frequency specified, just pick first one
             if length(var_idx_tmp)>1
-                warning('var_chars:MultOpts',['There are multiple possible data frequencies listed for "',var_idx,'," the first one in the order of Varnames.csv (row ',num2str(var_idx_tmp(1)),') will be used'])
+                warning('var_chars:MultOpts',['There are multiple possible data frequencies listed for "',...
+                    var_idx,'," the first one in the order of Varnames.csv (row ',num2str(var_idx_tmp(1)),') will be used'])
                 var_idx = var_idx_tmp(1);
             else
                 var_idx = var_idx_tmp;

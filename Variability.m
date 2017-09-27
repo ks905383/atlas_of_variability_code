@@ -127,9 +127,12 @@ function Variability(VarIndices,modelArray,varargin)
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last modified 06/05/2017
+%   Last modified 09/06/2017
 
 %% 1 Misc Setup
+% Allow for string input (as opposed to cell) for model name
+if ~isa(modelArray,'cell'); modelArray = {modelArray}; end
+
 % Get timestamp (to identify logs)
 format shortG
 startTimestamp = clock;
@@ -154,22 +157,10 @@ num_splits = 1;
 file_end_save = [];
 file_end = '*DATA.mat';
 
-%Frequency band determinants ([freq],[long names],[period bounds],[IDs])
+%Frequency band determinants default settings (taken from various_defaults)
 cust_freqs = false;
 various_defaults = matfile('various_defaults.mat');
 freq_band_setup = various_defaults.freq_band_setup;
-%freq_band_setup = {'day',{'< 5 days','5 - 30 days','30 - 365 days','> 1 year','all frequencies','2 - 15 days','15 - 90 days'},...
-%    [0,5;5,30;30,365;365,Inf;0,Inf;2,15;15,90],...
-%    {'HF','MF','LF','XF','Full','2to15','15to90'};...
-%    'month',{'< 1 year','> 1 year','all frequencies'},...
-%    [0,12;12,Inf;0,Inf],...
-%    {'LF','XF','Full'};...
-%    'year',{'< 10 years',' > 10 years','all frequencies'},...
-%    [0,10;10,Inf;0,Inf],...
-%    {'XXF','XXXF','Full'};...
-%   '3hour',{'< 5 days','5 - 30 days','30 - 365 days','> 1 year','all frequencies','2 - 15 days','15 - 90 days'},...
-%    [0,40;40,240;240,365*8;365*8,Inf;0,Inf;16,15*8;15*8,720],...
-%    {'HF','MF','LF','XF','Full','2to15','15to90'}};
 
 %% 3 Set behavior of optional function flags
 if (~isempty(varargin))
