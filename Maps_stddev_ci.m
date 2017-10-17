@@ -708,7 +708,7 @@ for i = 1:length(VarIndices)
                     %% 3.2.5 Annotate Figure
                     if show_caption
                         %Set caption descriptions
-                        AnnotateString = [freqdesc,vardesc,' ',season_desc,char(10),modelArray{j},char(10)];
+                        AnnotateString = [freqdesc,vardesc,' ',season_desc,newline,modelArray{j},char(10)];
                         if mark_ci
                             AnnotateString = [AnnotateString,'Gray crosses show pixels not meaningfully different from 1']; %#ok<AGROW>
                         end
