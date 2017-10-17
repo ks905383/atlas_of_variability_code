@@ -22,7 +22,7 @@ function varargout = data_colormap(dataset,color_split,varargin)
 %   Run methods can be changed below in options. 
 %
 %   Function requirements (on path): rgb (from MathWorks community, if
-%   inputting CSS3 color names)
+%   inputting CSS3 color names), piecelin (from MathWorks community)
 %
 %   Sample use: graphing standard deviations vs. means of climate output,
 %   but colorscaled by latitude using 18 easily identifiable finite colors
@@ -44,7 +44,8 @@ function varargout = data_colormap(dataset,color_split,varargin)
 %                             'def', nothing will change (default option
 %                             setting kept to increase code flexibility)
 %       'colormap',[cmap]   - set colormap manually. [cmap] can either be a
-%                             string (valid MATLAB colormap name), a
+%                             string (valid MATLAB colormap name or name of
+%                             a colormap in standard_colormaps.mat), a
 %                             numeric RGB array, or a CSS3 supported color
 %                             name . If manually inputted RGB array doesn't
 %                             have a length divisble by [color_split],
@@ -52,16 +53,28 @@ function varargout = data_colormap(dataset,color_split,varargin)
 %                             fill in colors. If fewer colors are provided
 %                             than [color_split], only those colors are
 %                             used and a warning is thrown.
-%       'treat_nans',[log]  - whether to do anythign to NaNs (by default
-%                             true; not doing so can result in strange 
-%                             outlier points).
+%       'treat_nans',[log]  - whether to set NaNs to a specific color set
+%                             below (by default true; not doing so can
+%                             result in strange outlier points).
 %       'nan_color',[num]   - set NaN color to which NaN members are
 %                             assigned if treat_nans == true. By default
 %                             [0.9 0.9 0.9]. Must be RGB value. 
 %
+%   Note: the file [standard_colormaps.mat], included with the code
+%   package, includes a few useful colormaps for values that can take on
+%   both negative and positive values, and can be used by setting the flag
+%   'colormap' to one of the following names: 
+%           - 'ColorRtB':   a colormap going from red to blue, passing 
+%                           close to white at its center. 
+%           - 'ColorRtWtB': a colormap passing from red to blue, but with a
+%                           broad white center
+%           - 'ColorRtGtB': a colormap passing from red to blue, but with a
+%                           broad grey center (useful for scatterplots on a
+%                           white background)
+%
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last edit: 11/15/2016
+%   Last edit: 10/17/2017
 
 %Vectorize dataset and make sure to avoid floating-point precision issues
 dataset = round(dataset(:),8,'significant');
@@ -70,7 +83,7 @@ dataset = round(dataset(:),8,'significant');
 cmap = flipud(jet(color_split));
 clim_range = range(dataset);
 start_value = min(dataset);
-load('standard_colormaps');
+def_cmaps = load('standard_colormaps');
 treat_nans = true;
 nan_color = [0.9 0.9 0.9];
 
@@ -97,10 +110,10 @@ if (~isempty(varargin))
                 cmap = varargin{in_idx+1}; varargin{in_idx+1} = 0; %to prevent switch from tripping
                 if isa(cmap,'char')
                     colormap_list = {'parula';'jet';'hsv';'hot';'cool';'spring';'summer';'autumn';'winter';'gray';'bone';'copper';'pink';'lines';'colorcube';'prism';'flag';'white'};
-                    cust_colormap_list = {'ColorRtB';'ColorRtGtB'};
+                    cust_colormap_list = fieldnames(def_cmaps);
                     if ~strcmp(cmap,'def')
                         if ~isempty(find(strcmp(cmap,cust_colormap_list),1))
-                            cmap = eval(cmap);
+                            cmap = def_cmaps.(cmap);
                         elseif isempty(find(strcmp(cmap,colormap_list),1))
                             %if a CSS3 color, can define using rgb
                             try cmap = rgb(cmap);
@@ -118,7 +131,7 @@ if (~isempty(varargin))
                         cmap = flipud(jet(color_split));
                     end
                 end
-                if size(cmap,1) < color_split;
+                if size(cmap,1) < color_split
                     warning('DATA_COLORMAP:TooFewColors',['Inputted colormap has fewer colors than color_split, only ',num2str(size(cmap,1)),' color(s) will be used'])
                     color_split = size(cmap,1);
                 end
@@ -133,8 +146,6 @@ end
 %Modify colormap if it contains more colors than desired in [color_split]
 if size(cmap,1) ~= color_split
     if mod(size(cmap,1),color_split)~=0 %If interpolation needed (# of colors not an integer multiple of [color_split])
-        %Add directory containing piecelin function to matlab path
-        addpath /project/moyer/Kevin/Code/ncm/
         %Use piecewise linear interpolation to create new colormap with the
         %desired number of colors
         colorscale_split = zeros(color_split,3);
@@ -155,7 +166,7 @@ color_steps = start_value+(0:color_split-1)*(clim_range/(color_split));
 %to each data point by minimizing distance to the midpoint of the 'color
 %step' defined as [color_steps(k),color_steps(k+1)).
 rgb_adj = zeros(length(dataset),3);
-for i = 1:length(dataset);
+for i = 1:length(dataset)
     if size(cmap,1) == 1 %If just one color inputted, assign that to all data values
         rgb_adj(i,:) = cmap;
     else

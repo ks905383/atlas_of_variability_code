@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  17 OCT 2017 10:35
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  17 OCT 2017 11:07
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -486,7 +486,7 @@ Package pdftex.def Info: RegionsMap.pdf used on input line 269.
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [12]
-Overfull \hbox (4.99225pt too wide) in paragraph at lines 329--330
+Overfull \hbox (4.99225pt too wide) in paragraph at lines 330--331
 []\OT1/cmr/m/n/10 run \OT1/cmtt/m/n/10 Saves(5,\OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/
 10 `CSIRO-Mk3-6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ,`experiments',\OMS/cmtt/m
 /n/10 f\OT1/cmtt/m/n/10 `rcp85',`historical',`piControl'\OMS/cmtt/m/n/10 g\OT1/
@@ -494,7 +494,7 @@ cmtt/m/n/10 )
  []
 
 
-Overfull \hbox (36.49197pt too wide) in paragraph at lines 330--331
+Overfull \hbox (36.49197pt too wide) in paragraph at lines 331--332
 []\OT1/cmr/m/n/10 run \OT1/cmtt/m/n/10 Variability(5,\OMS/cmtt/m/n/10 f\OT1/cmt
 t/m/n/10 `CSIRO-Mk3-6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ,`experiments',\OMS/
 cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`historical',`piControl'\OMS/cmtt/m/n/10 
@@ -502,7 +502,7 @@ g\OT1/cmtt/m/n/10 )
  []
 
 
-Overfull \hbox (2.3258pt too wide) in paragraph at lines 331--332
+Overfull \hbox (2.3258pt too wide) in paragraph at lines 332--333
 []\OT1/cmr/m/n/10 run \OT1/cmtt/m/n/10 SpectralRatios(5,\OMS/cmtt/m/n/10 f\OT1/
 cmtt/m/n/10 `CSIRO-Mk3-6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ,`experiments',\O
 MS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`piControl'\OMS/cmtt/m/n/10 g\OT1/cmtt
@@ -510,7 +510,7 @@ MS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`piControl'\OMS/cmtt/m/n/10 g\OT1/cmtt
  []
 
 
-Overfull \hbox (9.7702pt too wide) in paragraph at lines 331--332
+Overfull \hbox (9.7702pt too wide) in paragraph at lines 332--333
 \OT1/cmtt/m/n/10 SpectralRatios(5,\OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `CSIRO-Mk3
 -6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ,`experiments',\OMS/cmtt/m/n/10 f\OT1/c
 mtt/m/n/10 `rcp85',`historical'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ) \OT1/cmr/m/
@@ -518,7 +518,7 @@ n/10 (Sec-tion
  []
 
 
-Overfull \hbox (10.16112pt too wide) in paragraph at lines 332--333
+Overfull \hbox (10.16112pt too wide) in paragraph at lines 333--334
 \OT1/cmtt/m/n/10 `experiments',\OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`hist
 orical'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 , `show[]freqs',\OMS/cmtt/m/n/10 f\OT
 1/cmtt/m/n/10 `HF',`MF',`mean',`LF'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ) \OT1/cm
@@ -526,7 +526,7 @@ r/m/n/10 (Sec-
  []
 
 
-Overfull \hbox (26.83202pt too wide) in paragraph at lines 333--334
+Overfull \hbox (26.83202pt too wide) in paragraph at lines 334--335
 []\OT1/cmr/m/n/10 run \OT1/cmtt/m/n/10 Plots[]Log[]Panel[]prod(5, \OMS/cmtt/m/n
 /10 f\OT1/cmtt/m/n/10 `CSIRO-Mk3-6-0'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 , `expe
 riments', \OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`piControl'\OMS/cmtt/m/n/1
@@ -534,7 +534,7 @@ riments', \OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `rcp85',`piControl'\OMS/cmtt/m/n/1
  []
 
 
-Overfull \hbox (51.08174pt too wide) in paragraph at lines 333--334
+Overfull \hbox (51.08174pt too wide) in paragraph at lines 334--335
 \OT1/cmtt/m/n/10 `show[]freqs', \OMS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `LF',`XF'\OM
 S/cmtt/m/n/10 g\OT1/cmtt/m/n/10 , `clip[]lat',30,55, `color[]by',`data', \OMS/c
 mtt/m/n/10 f\OT1/cmtt/m/n/10 `piControl'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 , \O
@@ -542,24 +542,24 @@ MS/cmtt/m/n/10 f\OT1/cmtt/m/n/10 `mean'\OMS/cmtt/m/n/10 g\OT1/cmtt/m/n/10 ,
  []
 
 (./Code Package Documentation.bbl [13])
-<Knutti_family_tree.png, id=424, 796.4154pt x 757.3896pt>
+<Knutti_family_tree.png, id=423, 796.4154pt x 757.3896pt>
 File: Knutti_family_tree.png Graphic file (type png)
 
 <use Knutti_family_tree.png>
-Package pdftex.def Info: Knutti_family_tree.png used on input line 363.
+Package pdftex.def Info: Knutti_family_tree.png used on input line 364.
 (pdftex.def)             Requested size: 430.00462pt x 408.92651pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [14] [15] [16]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 456.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 457.
  [17] [18 <./Knutti_family_tree.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 456.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 457.
 
 (./Code Package Documentation.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 456.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 456.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 457.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 457.
 Package rerunfilecheck Info: File `"Code Package Documentation".out' has not ch
 anged.
 (rerunfilecheck)             Checksum: A0811D07AEB0E18E5349E213E519D421;3319.
@@ -570,7 +570,7 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 456.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 457.
  ) 
 Here is how much of TeX's memory you used:
  7177 strings out of 492995
@@ -579,7 +579,7 @@ Here is how much of TeX's memory you used:
  10521 multiletter control sequences out of 15000+600000
  13487 words of font info for 53 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,18n,28p,1533b,444s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,18n,28p,1533b,442s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
@@ -603,7 +603,7 @@ ist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2017/texmf-di
 st/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2017/texmf-dis
 t/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2017/texmf-dist
 /fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on "Code Package Documentation.pdf" (18 pages, 894434 bytes).
+Output written on "Code Package Documentation.pdf" (18 pages, 894504 bytes).
 PDF statistics:
  545 PDF objects out of 1000 (max. 8388607)
  483 compressed objects within 5 object streams
