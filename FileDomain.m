@@ -5,8 +5,7 @@ function VarDomain = FileDomain(filevar)
 %   purposes - for the variable given by the string [filevar] (using CMIP5
 %   variable abbreviations, found in /project/moyer/Kevin/Varnames.csv). 
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
 %   
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu

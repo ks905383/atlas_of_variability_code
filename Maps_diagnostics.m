@@ -1,12 +1,12 @@
-function Maps_pi_flat(VarIndices,modelArray,varargin)
-% MAPS_PI_FLAT  Map various parameters, coll. known as 'pi diagnostics'
+function Maps_diagnostics(VarIndices,modelArray,varargin)
+% MAPS_DIAGNOSTICS  Map various parameters, coll. known as 'pi diagnostics'
 %
-%   MAPS_PI_FLAT(VarIndices,modelArray) creates a set of 4-panel maps
+%   MAPS_DIAGNOSTICS(VarIndices,modelArray) creates a set of 4-panel maps
 %   showing 1) PI mean values, 2) PI standard deviations, 3) difference in
 %   mean values RCP8.5-PI, and 4) ratio of standard deviations RCP8.5/PI
 %   for each of the variables defined by [VarIndices] and models defined by
 %   [modelArray]. Maps are saved as .eps files in
-%   /project/moyer/Kevin/FinalFigs/[VarDomain]/PI_Diagnostics/.
+%   [figure_dir]/[VarDomain]/PI_Diagnostics/.
 %   
 %   Warnings are thrown if graphs are not created for a specific
 %   model/variable pair or if RCP and PI calculations cover differing
@@ -22,7 +22,7 @@ function Maps_pi_flat(VarIndices,modelArray,varargin)
 %   Function requirements (on path): name_chars, var_chars, load_stddevs,
 %   load_means, FileDomain, and (from MathWorks Community) structfind.
 %
-%   MAPS_PI_FLAT(...,'[flag]',[params],...) modify program run as below:
+%   MAPS_DIAGNOSTICS(...,'[flag]',[params],...) modify program run as below:
 %       'experiments',[cell]- manually set experiments to process. Default
 %                             is {'piControl','rcp85'}; in general plots
 %                             are 1) {1} mean values, 2) {1} std devs, 3)
@@ -45,19 +45,20 @@ function Maps_pi_flat(VarIndices,modelArray,varargin)
 %       'testing'           - adds '_TEST' to filename
 %       'save_log'          - exports log of attempted saves with
 %                             success/failure status under
-%                             ~/CalcLogs/Maps_pi_flat_log_[starttime].txt
+%                             ~/CalcLogs/MAPS_DIAGNOSTICS_log_[starttime].txt
 %
 %   Saving convention: 
 %   [filevar]_[freq]_[model]_[exp2]_[exp1]_Diag_Maps(_[season]).eps   
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
 %
-%   See also MAPS_PI_EXTRAS, NAME_CHARS, 
+%   See also NAME_CHARS, 
 %   
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last modified 11/17/2016
+%   Last modified 11/26/2017
+
+various_defaults = matfile('various_defaults.mat');
 
 %Set clock (for logging purposes)
 format shortG
@@ -78,7 +79,7 @@ colorbar_bands = 32;
 
 %Set analysis settings
 process_byseason = false; season = [];
-folder_season = '/Seasons_DS6/';
+folder_season = various_defaults.season_dir;
 filename_add_save =[];
 
 %Set experiments
@@ -151,10 +152,10 @@ if save_log
 end
 
 %Load directory / labeling defaults
-various_defaults = matfile('/project/moyer/Kevin/Code/various_defaults.mat');
+various_defaults = matfile([various_defaults.code_dir,'various_defaults.mat']);
 %Set experiment markers
 exp_marker = cell(2,1);
-for idx = 1:2;
+for idx = 1:2
     try
         exp_marker(idx) = various_defaults.expArray_disp(find(cellfun(@(x) strcmp(expArray{idx},x),various_defaults.expArray_disp(:,1))),2); %#ok<FNDSB>
     catch
@@ -163,7 +164,7 @@ for idx = 1:2;
 end
 
 %% 2 Plot / Execute
-for i = 1:length(VarIndices);
+for i = 1:length(VarIndices)
     %% 2.1 Get variable characteristics
     [~,filevarFN,freq,vardesc,units,~,clim_type,freqdesc,~] = var_chars(VarIndices(i));
     
@@ -171,9 +172,9 @@ for i = 1:length(VarIndices);
     %Load intermodel means/std devs for colorbar limit definitions
     IntermodelStats = cell(length(expArray),1); mean_idx = zeros(2,1); full_idx = zeros(2,1);
     for experiment = 1:2
-        filenameIM = ['/project/moyer/Kevin/IntermodelStats/',filevarFN,freq,expArray{experiment},'_IntermodelStats.mat'];
+        filenameIM = [various_defaults.proc_data_dir,'IntermodelStats/',filevarFN,freq,expArray{experiment},'_IntermodelStats.mat'];
         if exist(filenameIM,'file'); lim_file = matfile(filenameIM);
-        else error('MapsPI:NoIntermodelStats',['The intermodel stats file for ',filevarFN,freq,expArray{experiment},...
+        else error('MapsDIAG:NoIntermodelStats',['The intermodel stats file for ',filevarFN,freq,expArray{experiment},...
                 ' can not be found. Please check for its existence or generate it using the function MapLimits.m'])
         end
         IntermodelStats{experiment} = lim_file.IntermodelStats; clear lim_file
@@ -236,7 +237,7 @@ for i = 1:length(VarIndices);
             if process_byseason
                 filename_add_save = ['_',season];
             end
-            filenameS = [various_defaults.figure_dir,VarDomain,'/PIDiagnostics/',filevarFN,freq,modelArray{j},'_',expArray{2},'_',expArray{1},'_',run{1},'Diag_Maps',filename_add_save];
+            filenameS = [various_defaults.figure_dir,VarDomain,'/',filevarFN,freq,modelArray{j},'_',expArray{2},'_',expArray{1},'_',run{1},'Diag_Maps',filename_add_save];
             
             %% 2.3.2 Plot, if desired
             if replace_files || (~replace_files && ~exist([filenameS,'.eps'],'file'))
@@ -303,7 +304,7 @@ for i = 1:length(VarIndices);
                     
                     clabel_tmp = {units,units,units,['\log_{10}(',units,' / ',units,')']};
                     [PlotData.('colorbar_label')]=clabel_tmp{:};
-                    for plot_idx = 1:3;
+                    for plot_idx = 1:3
                         PlotData(plot_idx).Data = PlotData(plot_idx).Data*unit_scale_constant;
                         if j == 1
                             PlotData(plot_idx).CLim = PlotData(plot_idx).CLim*unit_scale_constant;
@@ -368,10 +369,10 @@ for i = 1:length(VarIndices);
                     disp([filenameSpng,' saved']);
                 end
                 
-                EndMsg=['PI Diagnostics Maps for ',modelArray{j},' ',filevarFN,freq,' Complete'];
+                EndMsg=['Diagnostics Maps for ',modelArray{j},' ',filevarFN,freq,' Complete'];
                 disp(EndMsg);
                 
-                if close_graphs;
+                if close_graphs
                     close(gcf);
                 end
                 
@@ -397,12 +398,12 @@ for i = 1:length(VarIndices);
                 save_log_wrn = ['****',filevarFN,freq,modelArray{j},' Not Complete****'];
                 complete_log{(i-1)*length(modelArray)+j} = save_log_wrn;
             end
-            warningMsg=['PI Diag Maps for ',modelArray{j},' ',filevarFN,freq,' Not Created!'];
+            warningMsg=['Diag Maps for ',modelArray{j},' ',filevarFN,freq,' Not Created!'];
             warning(warningMsg);
             clearvars('-except',initial_vars{:});
         end
     end
-    EndMsg=['PI Diagnostics Maps for ',filevarFN,freq,' for All Models Complete'];
+    EndMsg=['Diagnostics Maps for ',filevarFN,freq,' for All Models Complete'];
     disp(EndMsg);
     
 end
@@ -410,7 +411,7 @@ end
 %% 3 Export log as table, if desired
 if save_log
     export_log = cell2table(complete_log','VariableNames',{'PIDiag1_attempted_executions'});
-    writetable(export_log,['/home/kschwarzwald/CalcLogs/Maps_pi_flat_log_',num2str(startTimestamp(1)),'-',num2str(startTimestamp(2)),'-',num2str(startTimestamp(3)),'-',num2str(startTimestamp(4)),'-',num2str(startTimestamp(5)),'-',num2str(startTimestamp(6)),'.txt']);
+    writetable(export_log,[various_defaults.log_dir,'MAPS_DIAGNOSTICS_log_',num2str(startTimestamp(1)),'-',num2str(startTimestamp(2)),'-',num2str(startTimestamp(3)),'-',num2str(startTimestamp(4)),'-',num2str(startTimestamp(5)),'-',num2str(startTimestamp(6)),'.txt']);
 end
 
 end

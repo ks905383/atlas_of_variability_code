@@ -51,27 +51,33 @@
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last modified 03/03/2017 
+%   Last modified 11/15/2017 
 
 clear
 %% Default locations 
 %Basic code directory
-code_dir = '/project/moyer/Kevin/Code/';
+code_dir = '~/Documents/GitHub/atlas_of_variability_code/';
 
 %Raw Data directory
-raw_data_dir = '/project/moyer/CMIP5_Raw/';
+raw_data_dir = '~/Documents/climate_data/';
 
 %Processed Data directory
-proc_data_dir = '/project/moyer/Kevin/';
+proc_data_dir = '~/Documents/climate_data/';
 
 %Seasonal Data directory (in each [proc_data_folder]/[model]/)
-season_dir = '/Seasons_DS6/';
+season_dir = '/seasonal_data/';
 
 %Figure save directory
-figure_dir = '/project/moyer/Kevin/FinalFigs/';
+figure_dir = '~/Documents/climate_data/';
 
 %Gridweights directory
-gridweights_dir = '/project/moyer/Kevin/Code/GridWeights/';
+gridweights_dir = '~/Documents/climate_data/';
+
+%Temporary storage directory (for multi-processor computing)
+tmp_dir = '~/Documents/climate_data/';
+
+%Log storage directory (for logs of code runs)
+log_dir = '~/Documents/climate_data/';
 
 %% Default expressions
 %Display names of experiment runs (column 1 = 'raw'/save name, column 2 =
@@ -123,6 +129,14 @@ freq_band_setup = {'day',{'< 5 days','5 - 30 days','30 - 365 days','> 1 year','a
                    '3hour',{'< 5 days','5 - 30 days','30 - 365 days','> 1 year','all frequencies','2 - 15 days','15 - 90 days'},...
                            [0,40;40,240;240,365*8;365*8,Inf;0,Inf;16,15*8;15*8,720],...
                            {'HF','MF','LF','XF','Full','2to15','15to90'}};
+                           
+freq_band_setup_seasons = {'day',{'< 3 days','3 - 15 days','15 - 90 days'},...
+							[0,3;3,15;15,90],...
+							{'HF','MF','LF'};...
+							'month',{'< 3 months'},...
+							[0,3],...
+							{'LF'}};
+
              
 %% Frequency band name addendum
 %For some graphing options, members of the following cell array will be

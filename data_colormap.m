@@ -83,7 +83,7 @@ dataset = round(dataset(:),8,'significant');
 cmap = flipud(jet(color_split));
 clim_range = range(dataset);
 start_value = min(dataset);
-def_cmaps = load('standard_colormaps');
+def_cmaps = matfile('standard_colormaps.mat');
 treat_nans = true;
 nan_color = [0.9 0.9 0.9];
 

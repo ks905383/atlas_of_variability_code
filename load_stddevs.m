@@ -63,9 +63,9 @@ function varargout = load_stddevs(var_idx,model,exp,varargin)
 %
 %   LOAD_STDDEVS(...,'[flag]',[params],...) modify program run as below:
 %       'season_folder',[char]      - changes folder in
-%                                     /project/moyer/Kevin/[model] in which
+%                                     [proc_data_dir]/[model] in which
 %                                     seasonal data is looked for (def:
-%                                     '/Seasons_DS6/')
+%                                     [seasonal_dir])
 %       'use_convention',[#]        - specifies which timeframe of file to
 %                                     look for by its spot in the
 %                                     system-returned order in the target
@@ -82,17 +82,17 @@ function varargout = load_stddevs(var_idx,model,exp,varargin)
 %                                     if unclear if right timeframe is
 %                                     being outputted)
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
 %
 %   See also LOAD_MEANS, NAME_CHARS,
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last modified 05/10/2016
+%   Last modified 11/26/2017
 
 %Set defaults
-folder_season = '/Seasons_DS6/';
+various_defaults = matfile('various_defaults.mat');
+folder_season = various_defaults.season_dir;
 use_convention = 1;
 strtyr_find = []; endyr_find = [];
 keep_warnings = false;
@@ -123,7 +123,7 @@ if (~isempty(varargin))
                 use_convention = varargin{in_idx+1};
             case {'start_year'}
                 strtyr_find = varargin{in_idx+1}; varargin{in_idx+1} = 0;
-            case {'end_year'}
+            case {'end_year'} %NOT YET DEVELOPED
                 endyr_find = varargin{in_idx+1}; varargin{in_idx+1} = 0;
             case {'run'} %NOT YET DEVELOPED
                 run_set = varargin{in_idx+1}; varargin{in_idx+1} = 0;
@@ -166,7 +166,7 @@ if strcmp(season,'all') %Get location standards for non-seasonal data
     end
 else %Get location standards for seasonal data
     filename_add_open = ['_',season];
-    folder = folder_season; dir_seas = ['/project/moyer/Kevin/',model,folder];
+    folder = folder_season; dir_seas = [various_defaults.proc_data_dir,model,folder];
     [~,run,strtyr,endyr,num_conventions] = name_chars(model,{exp},filevar,freq,'directory',dir_seas,'file_end',['*Power_',season,'.mat'],'use_convention',use_convention);
     if ~isempty(strtyr_find) %If explicitly setting start year
         if strtyr{1} ~= strtyr_find
@@ -185,7 +185,7 @@ else %Get location standards for seasonal data
 end
 
 %Load file
-filename = strcat('/project/moyer/Kevin/',model,folder,filevar,freq,model,'_',exp,'_',run{1},num2str(strtyr{1}),'-',num2str(endyr{1}),'_sqrtPower',filename_add_open,'.mat');
+filename = strcat(various_defaults.proc_data_dir,model,folder,filevar,freq,model,'_',exp,'_',run{1},num2str(strtyr{1}),'-',num2str(endyr{1}),'_sqrtPower',filename_add_open,'.mat');
 if exist(filename,'file')
     file1 = matfile(filename);
 else
@@ -235,7 +235,7 @@ if (nargout ~= 2 && ~output_filename) || ~isempty(property_out)
     end
 else
     
-    if output_filename;
+    if output_filename
         varargout{1} = filename;
     else
         varargout{1} = file1.lat;

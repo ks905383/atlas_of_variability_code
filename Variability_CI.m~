@@ -158,7 +158,6 @@ freq_char_id = find(~cellfun(@isempty,strfind(freq_band_setup(:,1),'day')));
 freq_bands = freq_band_setup{freq_char_id,3};
         freq_band_names = freq_band_setup{freq_char_id,2};
         freq_band_ID = freq_band_setup{freq_char_id,4};
-num_bands = length(freq_bands);
 
 %% 3 Set behavior of optional flags
 if (~isempty(varargin))
@@ -166,9 +165,7 @@ if (~isempty(varargin))
         switch varargin{in_idx}
             case {'experiments'}
                 expArray = varargin{in_idx+1}; varargin{in_idx+1} = 0;
-                if length(expArray)~=2
-                    error('VariabilityCI:MissingExp',['Two experiments are needed for confidence intervals on ratios calculations, but ',num2str(length(expArray)),' were inputted.'])
-                end
+                if 
             case {'block_size'}
                 block_size = varargin{in_idx+1};
             case {'nruns'}

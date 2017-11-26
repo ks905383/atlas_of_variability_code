@@ -91,15 +91,9 @@ function varargout = clip_region(region_id,varargin)
 %   Atlantic (SAT) showing up in a region subset of the East South Pacific
 %   (SPE) if the resolution is low to enough to cause longitudinal grid
 %   overlap between the coast off Tacna, Peru and the coast off Rio
-%   Gallegos, Argentina). When in doubt, check the location using (this
-%   uses the custom function base_worldmap.m as well):
-%           [idx_reg] = clip_region([region_id],[model],lat,lon);
-%           [idx_lon,idx_lat] = ind2sub([length(lon) length(lat)],idx_reg);
-%           base_worldmap();
-%           scatterm(lat(idx_lat),lon(idx_lon));
+%   Gallegos, Argentina). 
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
 %
 %   See also CLIP_LAT, CLIP_CI, CLIP_VAR_MIN,
 %

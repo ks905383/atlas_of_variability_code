@@ -45,12 +45,12 @@ Furthermore, the code makes several assumptions and simplifications. Generally, 
 
 Finally, filename conventions are based on CMIP5 defaults. The pre-processing code expects raw NetCDF files of a certain filename format, and does calculations based on values in certain positions in those filenames. See more details below. 
 
-In general, users of this code package are expected to know their way around MATLAB (i.e.\ `do you know what the differences between a cell array, a struct, and a numerical array are?') and have a basic understanding of the NetCDF file structure. Every function has a detailed header description that often includes use examples and can be accessed by typing \texttt{help [function name]} into Matlab. 
+In general, users of this code package are expected to know their way around MATLAB (i.e.\ ``do you know what the differences between a cell array, a struct, and a numerical array are?') and have a basic understanding of the NetCDF file structure. Every function has a detailed header description that often includes use examples and can be accessed by typing \texttt{help [function name]} into Matlab. 
 
 For any questions, comments, concerns, complaints, etc., feel free to contact the author (Kevin Schwarzwald, kschwarzwald@uchicago.edu). 
 
 \begin{figure}[h]
-\caption{Function List}
+\caption{Function List (excluding third-party functions}
 \begin{center}
 \begin{tabular}{l c | p{3.5in}}
 Function Name&Type&Description\\ \hline
@@ -58,20 +58,25 @@ Function Name&Type&Description\\ \hline
 \texttt{Saves}&Pre-processing&Convert NetCDF files into \texttt{.mat} files\\ 
 \texttt{var\_chars}&Aux&Access variable-frequency information\\
 \texttt{name\_chars}&Aux&Access individual file information\\ 
+\texttt{File\_Domain}&Aux&Sets file to save figures in\\
 \texttt{Variability}&Variability&Calculate frequency band contributions to variability\\
 \texttt{Variability\_seasons}&Variability&Calculate intra-/inter-seasonal variability\\
 \texttt{Variability\_ci}&Variability&Get confidence intervals on variability changes\\
+\texttt{Spectral\_Ratios}&Aux&Calculate ratio of variability or summary statistics\\
 \texttt{load\_stddevs}&Aux&Load files, file subsets, and characteristics of variability data\\
 \texttt{load\_means}&Aux&Load files, file subsets, and characteristics of mean data\\
-\texttt{Maps\_stddev\_ci}&Mapping&Map changes in variability\\ 
-\texttt{Maps\_pi\_flat}&Mapping&Map diagnostics of a variable\\
-\texttt{Plots\_Log\_Panel\_prod}&Plotting& \\
-\texttt{data\_colormap}&Aux&Assign colors to matrix elements\\
+\texttt{Maps\_ratio}&Mapping&Map changes in variability\\ 
+\texttt{Maps\_diagnostics}&Mapping&Map diagnostics/summary statistics of a variable\\
+\texttt{data\_colormap}&Aux&Assign colors to array elements\\
 \texttt{clip\_lat}&Aux&Get indices of pixels within a latitude range\\
 \texttt{clip\_region}&Aux&Get indices of pixels within a geographic region\\
 \texttt{clip\_ci}&Aux&Get indices of pixels with non-significant variability changes\\
 \texttt{clip\_minval}&Aux&Get indices of pixels above a certain value\\
 \texttt{clip\_maxval}&Aux&Get indices of pixels below a certain value\\
+\texttt{subset\_find}&Aux&Find indices of one array within another\\
+\texttt{subplot\_pos}&Aux&A collection of figure-friendly subplot positions\\
+\texttt{loc\_descriptor}&Aux&Get human-readable political description of a lat/lon pair\\
+\texttt{quote\_me}&Aux&Just spits out a positive quote about science\\
 \end{tabular}
 \end{center}
 \end{figure}
@@ -81,7 +86,7 @@ Function Name&Type&Description\\ \hline
 \subsection{Setting Processing and Saving Defaults}\label{func:various_defaults.m}
 All saving and processing defaults are stored in the file \texttt{various\_defaults.mat} and set by running the function \texttt{various\_defaults.m}. This program and file controls the directories for storing code, raw data, processed data, seasonal data, figures, and grid area weights. These must be set to the desired paths before running any other function in this package. These directories do not necessarily need to be different from another. NOTE: the code assumes that data is stored in model-specific subfolders of the relevant directories set by \texttt{various\_defaults.mat}. For example, raw NetCDF data for CCSM4 should be saved in the directory \texttt{[raw\_data\_dir]/CCSM4/}, with \texttt{[raw\_data\_dir]} set by \texttt{various\_defaults.m}. Please check the function header itself for a full list of which directories imply subdirectories. 
 
-\texttt{various\_defaults.mat} also sets the default frequency bands calculated by \texttt{Variability.m} (see Section \ref{sec:var}). Finally, \texttt{various\_defaults.mat} sets model and experiment name conversions for display purposes (the filename versions of many experiment and model name are different from the human-readable names) and some auxiliary defaults useful for annotations. See the header of the file (\texttt{help various\_defaults} with it on the path) for more detailed descriptions.
+\texttt{various\_defaults.mat} also sets the default frequency bands calculated by \texttt{Variability.m} (see Section \ref{sec:var}), \texttt{Variability\_ci.m} (see Section \ref{sec}), and \texttt{Variability\_seasons.m} (see Section \ref{sec}). Finally, \texttt{various\_defaults.mat} sets model and experiment name conversions for display purposes (the filename versions of many experiment and model name are different from the human-readable names) and some auxiliary defaults useful for annotations. See the header of the file (\texttt{help various\_defaults} with it on the path) for more detailed descriptions.
 
 \subsection{File Convention}
 All functions beyond the pre-processing / saving functions assume the raw data is stored in a specific standardized (\texttt{.mat}) format in the \texttt{[raw\_data\_dir]/[model\_name]/} set by \texttt{various\_defaults.mat} run above, with the filenaming convention: 
@@ -126,6 +131,8 @@ For most variables, the file variable identifier should be modeled on the CMIP5 
 \subsection{Saving Procedure} 
 The \textit{Atlas of Variability} Code Package includes one program designed to process CMIP5 NetCDF data into the \texttt{\_DATA.mat} format, \texttt{Saves.m}. Given a \texttt{[var\_idx]} representing a variable and frequency in addition to a model, \texttt{Saves.m} looks into the \texttt{[raw\_data\_dir]} from \texttt{various\_defaults.m} to find one or more NetCDF files, and collates/clips them into a \texttt{.mat} file in the above convention of the desired length (by default, 30 years; see the function header for options on changing what chunk is extracted and saved). 
 
+Any data that follows the CMIP5 naming convention and the required NetCDF file format should be processable without any modification of \texttt{Saves.m}, with built-in options for setting the variable and attribute names to look for in the \texttt{.nc} file when they are different than the CMIP5 format included in the program. See the \texttt{Saves.m} header (by calling \texttt{help Saves}) for full details. 
+
 Daily / sub-daily data should generally be stored \textit{without leap years}! \texttt{Saves.m} does this automatically by removing the 366th day of leap years in gregorian / julian / proleptic gregorian calendars. 
 
 \section{General Function Form} %% GENERAL FUNCTION FORM
@@ -160,17 +167,17 @@ Though much of this data is theoretically accessible through the original NetCDF
 If a future version of this code package were to switch entirely to keeping data as NetCDF files, the information contained in \texttt{Varnames.csv} could be saved in the NetCDF header, with \textbf{[variable ID \#]} being replaced in program input by a variable name and data frequency combination. 
 
 \subsection{Common Function Flags and Input Conventions}
-Though I encourage you to refer to the header of each function for an exhaustive list of function flags and program run modifications (by typing \texttt{help [function name]} into the MATLAB console), a few flags are general across the code package and are worth enumerating here:
+Though the reader is encouraged to refer to the header of each function for an exhaustive list of function flags and program run modifications (by typing \texttt{help [function name]} into the MATLAB console), a few flags are general across the code package and are worth enumerating here:
 
 \begin{description}
 \item [`testing'] adds the suffix \texttt{\_TEST} to the output filename(s)
-\item [`experiments'] sets the experiment runs processed, in cell array format (e.g.\ \texttt{\{rcp85,piControl\}}, must be written as in filenames; different display names, for example RCP8.5 instead of rcp85, are supported through changing the \textbf{expArray\_disp} array in \texttt{various\_defaults.m})). Some code, such as \texttt{Maps\_stddev\_ci.m} or \texttt{SpectralRatios.m}, requires multiple experiment inputs in a specific order, please see function headers for exact requirements. 
+\item [`experiments'] sets the experiment runs processed, in cell array format (e.g.\ \texttt{\{rcp85,piControl\}}, must be written as in filenames; different display names, for example RCP8.5 instead of rcp85, are supported through changing the \textbf{expArray\_disp} array in \texttt{various\_defaults.m})). Some code, such as \texttt{Maps\_ratio.m} or \texttt{SpectralRatios.m}, requires multiple experiment inputs in a specific order, please see function headers for exact requirements. 
 \end{description}
 
 \section{Calculating Variability} %% CALCULATING VARIABILITY
 \subsection{Calculating Frequency Contributions to Variability}
 \label{sec:var}\label{func:Variability.m}
-The core purpose of this program package is to calculate the frequency-separated variability of an arbitrary climatic variable; in other words, the portion of the standard deviation contributed to by patterns within certain frequencies. This is done through the following process (a mathier description is found in Appendix [X]):
+The core purpose of this program package is to calculate the frequency-separated variability of an arbitrary climatic variable; in other words, the portion of the standard deviation contributed to by patterns within certain frequencies. This is done through the following process (a more rigorous description is found in Appendix \ref{app:math}):
 
 \begin{enumerate}
 \item Detrending: a simple linear trend is removed from the time series (spectral density analysis requires stationarity)
@@ -189,27 +196,34 @@ This process is executed through the function \texttt{Variability.m} (see the fu
 
 The struct \textbf{StdDevs} also includes entries for the local mean values (as in \texttt{\_LocalMeans.mat} above) stored with \textbf{ID} = \texttt{`mean'} and the standard deviation stored with \textbf{ID} = \texttt{`std'}. The standard deviation is usually not exactly equal to the \texttt{`Full'} / all frequency band due to estimation precision in the spectral density calculation. Both \texttt{`std'} and \texttt{`mean'} are stored with \textbf{Size} = \texttt{[ ]} (an empty array). 
 
+This and the following two variability-calculating functions are optimized for parallel computing and by default parallelize processing across 12 processors. This can be changed in each function call. 
+
 \subsection{Calculating Seasonal Variability}
 \label{func:Variability_seasons.m}
+Intra- and inter-seasonal variability can be calculated through \texttt{Variability\_seasons.m}. As with \texttt{Variability.m}, the function \texttt{Variability\_seasons.m} takes in a \texttt{\_DATA.mat} file and outputs two files containing the local means and a struct with variability and summary statistics data, though now with the addition of a seasonal suffix: \texttt{\_LocalMeans\_[seas].mat} and \texttt{\_StdDevs\_[seas].mat}, respectively. The suffix \texttt{[seas]} is set by default in \texttt{various\_defaults.mat} and is generally a shorthand of the included months (i.e. \texttt{DJF} for Dec-Jan-Feb). By default, \texttt{DJF} and \texttt{JJA} are processed; for other seasons, please see the header of the function. 
+
+The frequency bounds for intra-seasonal variability calculations are taken as before from \texttt{various\_defaults.mat} (the variable \textbf{freq\_bands\_setup\_seasons}), with customizable bounds set in the function call (see the header). Interseasonal variability (\texttt{$>$ 1 year}) is defined as the standard deviation of seasonal means across years in the data set. 
+
+By default, the function processes 30 seasons. If the start and end dates of a season are in different calendar years, the function will attempt to take data from 31 (or \texttt{[nyears] + 1} for custom year lengths) years of raw data to keep the total number of seasons contained in the analysis consistent. Warnings will be thrown if this is not possible. 
 
 \subsection{Calculating Variability Ratios}
 \label{func:SpectralRatios.m}
-For a slight simplification in manual examination of variability change data, the code package allows for the creation of extra files that store the ratio of frequency-separated variability between two experiments (these files are also necessary to run \texttt{Maps\_stddev\_ci.m}). This process occurs through the program \texttt{SpectralRatios.m}. The function is called as normal, with an important input to remember:
+For a slight simplification in manual examination of variability change data, the code package allows for the creation of extra files that store the ratio of frequency-separated variability between two experiments (these files are also necessary to run \texttt{Maps\_ratio.m}). This process occurs through the program \texttt{SpectralRatios.m}. The function is called as normal, with an important input to remember:
 \begin{equation}
 \texttt{SpectralRatios}([\text{variable ID \#}],[\text{model}],(\text{`experiments'},\{exp_2,exp_1\}),\dots)
 \end{equation}
 $exp_2$ and $exp_1$ are the two experiments between which the ratio should be calculated. Specifically, the ratio will be calculated as $\frac{exp_2}{exp_1}$ and is by default set as $exp_2=$ \texttt{rcp85} and $exp_1=$ \texttt{piControl}.
 
-The output file has the suffix \texttt{\_SpectralRatios.m} and the same structure as the \texttt{\_sqrtPower.m} file explained above, with the only difference being the name of the struct (\textbf{StdDevsRatio} instead of \textbf{StdDevs}). Importantly, the output filename no longer has the [\texttt{year}] field - in the current structure of the file system only one ratio file can be stored per run and experiment combination. To ensure that the SpectralRatios file is created from time series with the same length, the program cycles through \texttt{\_sqrtPower.m} files to find a matching pair (with warnings being thrown if equal length time series could not be found for both experiments). 
+The output file has the suffix \texttt{\_SpectralRatios.m} and the same structure as the \texttt{\_sqrtPower.m} file explained above, with the only difference being the name of the struct (\textbf{StdDevsRatio} instead of \textbf{StdDevs}) and the addition of a variable \textbf{file\_params} with the experiments, runs, and start/end years of the \texttt{\_DATA.mat} files used in the program run. Importantly, the output filename no longer has the [\texttt{year}] field - in the current structure of the file system only one ratio file can be stored per run and experiment combination. To ensure that the SpectralRatios file is created from time series with the same length, the program cycles through \texttt{\_sqrtPower.m} files to find a matching pair (with warnings being thrown if equal length time series could not be found for both experiments). 
 
-\subsection{Getting Confidence Intervals on Variability Changes}
+\subsection{Calculating Confidence Intervals on Variability Changes}
 \label{sec:var_ci}\label{func:Variability_CI.m}
-\texttt{Variability\_CI.m} allows the generation of confidence intervals on ratios of frequency-separated variability (and any other quantity saved in the \textbf{StdDevs} structs, such as mean or standard deviation). In absence of a large ensemble of runs of the same model, this is done using a boostrap methodology (see Appendix [XX] for derivation). NOTE: currently this procedure only supports daily data! Similar to \texttt{SpectralRatios.m}, \texttt{Variability\_CI.m} requires the input of two experiments: 
+\texttt{Variability\_CI.m} allows the generation of confidence intervals on ratios of frequency-separated variability (and any other quantity saved in the \textbf{StdDevs} structs, such as mean or standard deviation). In absence of a large ensemble of runs of the same model, this is done using a boostrap methodology (see Appendix \ref{app:math} for derivation). NOTE: currently this procedure only supports daily data! Similar to \texttt{SpectralRatios.m}, \texttt{Variability\_CI.m} requires the input of two experiments: 
 \begin{equation}
 \texttt{Variability\_CI}([\text{variable ID \#}],[\text{model}],(\text{`experiments'},\{exp_2,exp_1\}),\dots)
 \end{equation}
 
-The output file has the suffix \texttt{\_StdDevCI.mat} and has the same variables as \texttt{\_StdDevsRatio.mat} files above (\textbf{lat}, \textbf{lon}, \textbf{StdDevsRatio}) with the addition of a variable \textbf{file\_params} with the experiments, runs, and start/end years of the \texttt{\_DATA.mat} files used in the program run.\footnote{THIS SHOULD PROBABLY BE ADDED AS A FUNCTIONALITY TO \texttt{SpectralRatios.m} AS WELL}
+The output file has the suffix \texttt{\_StdDevCI.mat} and has the same variables as \texttt{\_StdDevsRatio.mat} files above (\textbf{lat}, \textbf{lon}, \textbf{StdDevsRatio}) with the addition of a variable \textbf{file\_params} with the experiments, runs, and start/end years of the \texttt{\_DATA.mat} files used in the program run.
 
 The variable \textbf{StdDevsRatio} has the fields (the first four are equivalent to \textbf{StdDevs} and \textbf{StdDevsRatio} above):
 \begin{description}
@@ -224,34 +238,24 @@ The variable \textbf{StdDevsRatio} has the fields (the first four are equivalent
 
 
 \section{Mapping Results} %% MAPPING RESULTS
-\label{func:Maps_stddev_ci.m}
-The code package includes some basic mapping tools. The most robust, and most used in the ``Atlas of Variability'' Project is \texttt{Maps\_stddev\_ci.m}, which produces a map / up to 6 subplotted maps of the change in variability between two experiments of a variable - frequency - model combination, and can hash out pixels without a meaningful change in variability, as calculated in \texttt{Variability\_CI.m}. It requires a previously calculated \texttt{\_SpectralRatios.mat} file for the experiments to be compared, and, if a marking of pixels without meaningful changes is desired, a previously calculated \texttt{\_StdDevsCI.mat} file.
+\subsection{Mapping ratios of variability changes}
+\label{func:Maps_ratio.m}
+The code package includes some basic mapping tools. The most robust, and most used in the ``Atlas of Variability'' Project is \texttt{Maps\_ratio.m}, which produces a map / up to 6 subplotted maps of the change in variability between two experiments of a variable - frequency - model combination, and can hash out pixels without a meaningful change in variability, as calculated in \texttt{Variability\_CI.m}. It requires a previously calculated \texttt{\_SpectralRatios.mat} file for the experiments to be compared, and, if a marking of pixels without meaningful changes is desired, a previously calculated \texttt{\_StdDevsCI.mat} file.
 
-Beyond the general functional form (as always, check the function header through \texttt{help Maps\_stddev\_ci} for all flags and details), I would like to point out two specific function flags:
+Beyond the general functional form (as always, check the function header through \texttt{help Maps\_ratio} for all flags and details), I would like to point out two specific function flags:
 \begin{description}
 \item [`show\_freqs'] a cell array of the form \texttt{\{`HF',`MF',\dots,`Full'\}} (with 1 - 6 cells), including the \textbf{ID}/short data identifier of the desired frequency band / quantity to be graphed
 \item [`plot\_method'] followed by either \texttt{`pcolorm'} or \texttt{`polygon'}. The former is the default, and uses the matlab function \texttt{pcolorm} to produce a geographic checkboard/pseudocolor plot. However, the pcolorm paradigm plots data at vertices, and so removes a row and column from each side (see \href{http://www.mathworks.com/matlabcentral/fileexchange/50706-offsets-and-missing-data-via-pcolor-and-surf?focused=3873981&tab=example}{\underline{here}} for details). The option \texttt{`polygon'} instead graphs each individual pixel as a filled polygon, solving this issue at the expense of computational efficiency (plotting and saving individual polygons results in a significant increase in processing time, and is therefore generally suggested to be used for production figures only). An added benefit of the \texttt{`polgyon'} option is the ability to more accurately show the shape of pixels in non-rectangular grids. Pixel edges are rectangular and taken from the \textbf{lat\_bnds} and \textbf{lon\_bnds} variables in a NetCDF file from the same model with the same lat/lon grid as the data. In other words, it searches the raw data folder's (set in \texttt{various\_defaults.m}) relevant model subset directory for a NetCDF file with the same lat/lon grid and the variables \textbf{lat\_bnds} and \textbf{lon\_bnds}. If this is not found, latitude and longitude bounds are inferred as being halfway between pixel coordinates, and a warning is thrown. 
 \end{description}
 
+\subsection{Mapping some summary statistics}
+In addition to \texttt{Maps\_ratio.m}, this package also includes the mapping function \texttt{Maps\_diagnostics.m}, which creates a set of 4-panel maps showing 1) mean values for \textit{exp$_1$}, 2) \textit{exp$_1$} standard deviations, 3) difference in mean values \textit{exp$_2$} - \textit{exp$_1$}, and 4) ratio of standard deviations $\frac{exp_2}{exp_1} $for a variable - model combination. By default, \textit{exp$_1$} and \textit{exp$_2$} are \texttt{piControl} and \texttt{rcp85}, respectively. See the function header for more detail. 
+
+\texttt{Maps\_diagnostics.m} requires color limits across models that it takes from running \texttt{MapLimits.m}. \texttt{MapLimits.m} creates a file with intermodel statistics that allow for a consistent intermodel colormap creation (these are \textit{not} rigorous summary statistics). See the function header for more detail.
+
 \section{Graphing Results} %% GRAPHING RESULTS
 \label{func:Plots_Log_Panel_prod.m}
-
-\section{Auxiliary Functions} %% AUXILIARY FUNCTIONS
-\subsection{Loading calculated data}
-The filenames used in the CMIP5 models and throughout this code package are admittedly a bit of a mouthful. Here's a few functions designed to make loading data a bit simpler and more pleasant.
-\subsubsection{Loading data from \texttt{\_sqrtPower.mat} files}
-\texttt{load\_stddevs.m} allows for the direct loading of the struct \textbf{StdDevs}, the lat/lon grid, or even subsets of the \textbf{StdDevs} struct (such as the IDs contained within it, etc.). The basic function call is as follows:
-\begin{equation}
-\textbf{[StdDevs,lat,lon]} = \texttt{load\_stddevs([var\_idx],[model],[experiment],([season]),\dots)}
-\end{equation}
-To make loading such data even easier, \texttt{[var\_idx]} can be replaced by the CMIP5 shorthands for variable and frequency, for example: \texttt{load\_stddevs(`pr',`day',\dots)}. To get the filename that the function is loading (to verify timeframe, etc.), add the flag \texttt{`filename'}. To get properties within the \textbf{StdDevs} struct, use the flag \texttt{`property',[field name]}. 
-
-\subsubsection{Loading data from \texttt{\_LocalMeans.mat} files}
-\texttt{load\_means.m} allows for the direct loading of the file LocalMeans or the lat/lon grid. The basic function call is as follows:
-\begin{equation}
-\textbf{[LocalMeans,lat,lon]} = \texttt{load\_means([var\_idx],[model],[experiment],([season]),\dots)}
-\end{equation}
-The data in \textbf{LocalMeans} is also found as \textbf{ID} $=$ \texttt{mean} in \textbf{StdDevs} above, but this allows a more direct loading of the mean values of a time series. 
+Explicit graphing functions (beyond the mapping functions detailed above) are not fully supported in this code package (a beta scatterplotting function, \texttt{panel\_plots.m} is included; see its header for a description and use at your own risk); however, certain auxiliary tools are included to make graphing easier. 
 
 \subsection{Subsetting data by region, value, etc.}
 The following are several functions designed to give linear indices of pixels that fulfill a certain geographic, numerical, or meaningfulness criteria. In general, these \texttt{clip\_*.m} files follow a basic input/output paradigm:
@@ -301,22 +305,55 @@ can be used. As an additional output, the exact latitudes used can be shown in a
 This clip requires a relevant \texttt{\_StdDevCI.mat} file calculated through \texttt{Variability\_CI.m} to function.  
 
 
-\section{Additional Functions / Files} %% ADDITIONAL FUNCTIONS / FILES
-\subsection{Background Functions}
 
-\subsection{Third Party/Community Functions}
-A few functions are taken from the MATLAB community. 
+\section{Auxiliary Functions} %% AUXILIARY FUNCTIONS
+\subsection{Loading calculated data}
+The filenames used in the CMIP5 models and throughout this code package are admittedly a bit of a mouthful. Here's a few functions designed to make loading data a bit simpler and more pleasant.
+\subsubsection{Loading data from \texttt{\_sqrtPower.mat} files}
+\texttt{load\_stddevs.m} allows for the direct loading of the struct \textbf{StdDevs}, the lat/lon grid, or even subsets of the \textbf{StdDevs} struct (such as the IDs contained within it, etc.). The basic function call is as follows:
+\begin{equation}
+\textbf{[StdDevs,lat,lon]} = \texttt{load\_stddevs([var\_idx],[model],[experiment],([season]),\dots)}
+\end{equation}
+To make loading such data even easier, \texttt{[var\_idx]} can be replaced by the CMIP5 shorthands for variable and frequency, for example: \texttt{load\_stddevs(`pr',`day',\dots)}. To get the filename that the function is loading (to verify timeframe, etc.), add the flag \texttt{`filename'}. To get properties within the \textbf{StdDevs} struct, use the flag \texttt{`property',[field name]}. 
+
+\subsubsection{Loading data from \texttt{\_LocalMeans.mat} files}
+\texttt{load\_means.m} allows for the direct loading of the file LocalMeans or the lat/lon grid. The basic function call is as follows:
+\begin{equation}
+\textbf{[LocalMeans,lat,lon]} = \texttt{load\_means([var\_idx],[model],[experiment],([season]),\dots)}
+\end{equation}
+The data in \textbf{LocalMeans} is also found as \textbf{ID} $=$ \texttt{mean} in \textbf{StdDevs} above, but this allows a more direct loading of the mean values of a time series. 
+
+\subsection{Getting subsets of arrays}
+\texttt{subset\_find.m} allows for finding the indices of subsets of arrays within larger arrays. The basic call is as follows: 
+\begin{equation}
+\textbf{[x\_idxs,y\_idxs]} = \texttt{subset\_find(}\textbf{x},\textbf{y},\textbf{x'},\textbf{y'}\texttt{)}
+\end{equation}
+where the matrix (\textbf{x',y'}) is a subset of the matrix (\textbf{x,y}), and \textbf{x\_idxs,y\_idxs} are the indices of each point in (\textbf{x',y'})'s position in (\textbf{x,y}). More specifically, in terms of climate data, this procedure allows finding a geographic subset inside a lat/lon grid, through the (identical) call 
+\begin{equation}
+\textbf{[lat\_idxs,lon\_idxs]} = \texttt{subset\_find(}\textbf{lat},\textbf{lon},\textbf{lat'},\textbf{lon'}\texttt{)}
+\end{equation}
+
+\subsection{Getting a human-readable location description}
+\texttt{loc\_descriptor.m} uses the Google Maps database to return a human-readable description of a lat/lon location. By default,
+\begin{equation}
+\textbf{loc\_desc} = \texttt{loc\_descriptor(lat,lon)}
+\end{equation}
+returns the most complete form of the location's address stored in the Google Maps database. For more comp[ex reverse geocoding (such as just getting the political division using the \texttt{`result\_type', `political'} flag) requires your own API key (see function header), which can be inputted using the \texttt{`api\_key'} flag. 
+
+
+\section{Third Party/Community Functions} %% ADDITIONAL FUNCTIONS / FILES
+A few functions (listed in Figure \ref{table:comm_funcs}) are taken from the MATLAB community. 
 
 \begin{figure}[h]
-\caption{Third-Party Function List}
+\caption{Third-Party Function List}\label{table:comm_funcs}
 \begin{center}
-\begin{tabular}{l p{1.5in} | p{3in}}
-Function Name&Type&Description\\ \hline
-\texttt{ds2nfu}&Plotting&Converts from data units to normalized figure units for placing objects onto plots\\
-\texttt{piecelin}&Calculation&Used for piecewise interpolation of colormaps in \texttt{data\_colormaps.m}\\
-\texttt{structfind}&Aux&Gets index of a struct based on matching a specific field\\
-\texttt{rgb}&Returns RGB triplet for CSS3 colors\\
-\texttt{wraptext}&Aux&Wraps output text\\ 
+\begin{tabular}{l p{0.8in} | p{2.7in} | p{1in} }
+Function Name&Type&Description&Author\\ \hline
+\texttt{ds2nfu}&Plotting&Converts from data units to normalized figure units for placing objects onto plots&Michelle Hirsch\\
+\texttt{piecelin}&Calculation&Used for piecewise interpolation of colormaps in \texttt{data\_colormaps.m}&\\
+\texttt{structfind}&Aux&Gets index of a struct based on matching a specific field&Dirk-Jan Kroon\\
+\texttt{rgb}&Plotting&Returns RGB triplet for CSS3 colors&Kristjan Jonasson\\
+\texttt{wraptext}&Aux&Wraps output text in console&Chad Greene\\ 
 \end{tabular}
 \end{center}
 \end{figure}
@@ -325,13 +362,13 @@ Function Name&Type&Description\\ \hline
 \section{Typical Code Run} %% TYPICAL CODE RUN (show the Basic File Saves or whatever it's called)
 The following shows an example code run from start to finish analyzing the relationship between changes in daily precipitation variability and mean in the model CSIRO Mk3.6.0 between RCP8.5 and pre-industrial control and between RCP8.5 and historical runs. The \texttt{`experiments'} calls aren't strictly necessary (except for RCP8.5 - historical comparisons) since they just represent the default function behavior, but are included for reference.
 \begin{enumerate}
-\item set raw / processed / output data directories in \texttt{various\_defaults.m} (Section \ref{func:various_defaults.m}); add the model to the \textbf{modelArray\_disp} variable to accommodate the model name (`CSIRO-Mk3-6-0' in the filesystem, `CSIRO Mk3.6.0' in figure captions); add the experiments to the \textbf{expArray\_disp} variable to accommodate experiment names (`rcp85' / `historical' / `piControl in the filesystem, `RCP8.5' / `Historical' / `PI Control' in figure captions)
+\item set raw / processed / output data directories in \texttt{various\_defaults.m} (Section \ref{func:various_defaults.m}); add the model to the \textbf{modelArray\_disp} variable to accommodate the model name (`CSIRO-Mk3-6-0' in the filesystem, `CSIRO Mk3.6.0' in figure captions); add the experiments to the \textbf{expArray\_disp} variable to accommodate experiment names (`rcp85' / `historical' / `piControl' in the filesystem, `RCP8.5' / `Historical' / `PI Control' in figure captions)
 \item download \texttt{pr\_day\_CSIRO-Mk3-6-0\_rcp85*.nc}, \texttt{pr\_day\_CSIRO-Mk3-6-0\_historical*.nc}, and \texttt{pr\_day\_CSIRO-Mk3-6-0\_piControl*.nc} files from ESGF, DKRZ, or your other favorite climate model data repository into the raw data directory set above
 \item run \texttt{Saves(5,\{`CSIRO-Mk3-6-0'\},`experiments',\{`rcp85',`historical',`piControl'\})} for daily precipitation row index 5 (from \texttt{Varnames.csv}, Section \ref{func:Varnames.csv}) to pre-process data into 30-year \texttt{*\_DATA.mat} files and to remove leap days
 \item run \texttt{Variability(5,\{`CSIRO-Mk3-6-0'\},`experiments',\{`rcp85',`historical',`piControl'\})} (Section \ref{func:Variability.m}) to calculate integrated spectral densities, means, and standard deviations
 \item run \texttt{SpectralRatios(5,\{`CSIRO-Mk3-6-0'\},`experiments',\{`rcp85',`piControl'\})} and \texttt{SpectralRatios(5,\{`CSIRO-Mk3-6-0'\},`experiments',\{`rcp85',`historical'\})} (Section \ref{func:SpectralRatios.m}) to save variability ratios
-\item run \texttt{Maps\_stddevs\_ci(5,\{`CSIRO-Mk3-6-0'\}, `experiments',\{`rcp85',`piControl'\},}\\ \texttt{`show\_freqs',\{`HF',`MF',`mean',`LF'\})} and \texttt{Maps\_stddevs\_ci(5,\{`CSIRO-Mk3-6-0'\}, \\`experiments',\{`rcp85',`historical'\}, `show\_freqs',\{`HF',`MF',`mean',`LF'\})} (Section \ref{func:Maps_stddev_ci.m}) to map the $<$ 5 day variability, 5 - 30 day variability, mean, and 30 - 365 day variability changes in daily precipitation between RCP8.5 and PI control and RCP8.5 and historical runs
-\item run \texttt{Plots\_Log\_Panel\_prod(5, \{`CSIRO-Mk3-6-0'\}, `experiments', \{`rcp85',`piControl'\}, `show\_freqs', \{`LF',`XF'\}, `clip\_lat',30,55, `color\_by',`data', \{`piControl'\}, \{`mean'\}, `log10')} (Section \label{func:Plots_Log_Panel_prod.m}) to create a scatterplot of variability changes vs.\ mean changes for 30 - 365 day and $>$ 1 year variability (in 2 subplots) in the mid-latitudes ($\abs{30^\circ-55^\circ}$), colored by the base-10 log of pre-industrial mean precipitation
+\item run \texttt{Maps\_ratio(5,\{`CSIRO-Mk3-6-0'\}, `experiments',\{`rcp85',`piControl'\},}\\ \texttt{`show\_freqs',\{`HF',`MF',`mean',`LF'\})} and \texttt{Maps\_ratio(5,\{`CSIRO-Mk3-6-0'\}, \\`experiments',\{`rcp85',`historical'\}, `show\_freqs',\{`HF',`MF',`mean',`LF'\})} (Section \ref{func:Maps_ratio.m}) to map the $<$ 5 day variability, 5 - 30 day variability, mean, and 30 - 365 day variability changes in daily precipitation between RCP8.5 and PI control and RCP8.5 and historical runs
+\item run \texttt{panel\_plots(5, \{`CSIRO-Mk3-6-0'\}, `experiments', \{`rcp85',`piControl'\}, `show\_freqs', \{`LF',`XF'\}, `clip\_lat',30,55, `color\_by',`data', \{`piControl'\}, \{`mean'\}, `log10')} (Section \ref{func:Plots_Log_Panel_prod.m})\footnote{in beta} to create a scatterplot of variability changes vs.\ mean changes for 30 - 365 day and $>$ 1 year variability (in 2 subplots) in the mid-latitudes ($\abs{30^\circ-55^\circ}$), colored by the base-10 log of pre-industrial mean precipitation
 \end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -340,33 +377,34 @@ The following shows an example code run from start to finish analyzing the relat
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
-\section{Conventions, Names, etc. Typically Found in Model-World}
-\subsection{Typical Model Experiments}
-\subsubsection{Transient vs. Equilibrated Model Runs}
+%\section{Conventions, Names, etc. Typically Found in Model-World}
+%\subsection{Typical Model Experiments}
+%\subsubsection{Transient vs. Equilibrated Model Runs}
+%
+%
+%\subsubsection{The Representative Concentration Pathways (RCPs)}
+%
+%
+%\subsection{Typical Model Technical Details}
+%
+%\subsubsection{Some Model Grids}
+%\begin{description}
+%\item [Basic Rectangular Lat/Lon Grids] the simplest grid - the earth is split up into a $lat\times lon$ grid with 1D vector \textbf{lat} and \textbf{lon} vectors. 
+%\item [Gaussian Grids] usually named [letter][number]. Naming conventions differ; NCAR uses T\#\#, with the number determining the spectral truncation (some explanation  \href{https://software.ecmwf.int/wiki/display/FCST/Relationship+between+spectral+truncation+and+grid+point+resolution}{\underline{here?}}). The grid is also rectangular, however latitudes are unequally spaced and defined by the Gaussian quadrature. No grid points at the poles. Typically the number of longitudes are twice that of latitudes. Can also be uniquely described by 1D \textbf{lat} and \textbf{lon} vectors. Gaussian grids allow for easier computation of integrals involved in the Fourier and Legendre transforms. 
+%\item [Orthogonal Curvilinear Grids] often used for ocean grids. Cannot be described by vectors in lat/lon space, \textbf{lat} and \textbf{lon} must be 2D arrays. Allows for a computationally efficient approach to grids with differing spatial scales. Based on a transformation from a rectangular grid. 
+%\end{description}
+%
+%\subsubsection{Model Components}
+%%Add Knutti family tree, one of the images from the bubble diagrams of model components grouped by code size
+%See the Software Architecture of Climate Models. 
+%\begin{figure}[h]
+%\includegraphics[width=\textwidth]{Knutti_family_tree.png}
+%\caption{Figure and following caption copied from \cite{knutti_climate_2013}: (a) The model ``family tree" from CMIP3 and CMIP5 (marked with asterisks) control climate plus observations (ERA40/GPCP and NCEP/CMAP), shown as a dendrogram (a hierarchical clustering of the pairwise distance matrix for temperature and precipitation fields, see text). Some of the models with obvious similarities in code or produced by the same institution are marked with the same color. Models appearing in the same branch are close, and similarity is larger the more to the left the branches separate (for a detailed description of the method, see Masson and Knutti [2011]). (b) Same but based on the predicted change in temperature and precipitation fields for the end of the 21st century in the RCP8.5 scenario relative to the control.}
+%\end{figure} 
 
 
-\subsubsection{The Representative Concentration Pathways (RCPs)}
-
-
-\subsection{Typical Model Technical Details}
-
-\subsubsection{Some Model Grids}
-\begin{description}
-\item [Basic Rectangular Lat/Lon Grids] the simplest grid - the earth is split up into a $lat\times lon$ grid with 1D vector \textbf{lat} and \textbf{lon} vectors. 
-\item [Gaussian Grids] usually named [letter][number]. Naming conventions differ; NCAR uses T\#\#, with the number determining the spectral truncation (some explanation  \href{https://software.ecmwf.int/wiki/display/FCST/Relationship+between+spectral+truncation+and+grid+point+resolution}{\underline{here?}}). The grid is also rectangular, however latitudes are unequally spaced and defined by the Gaussian quadrature. No grid points at the poles. Typically the number of longitudes are twice that of latitudes. Can also be uniquely described by 1D \textbf{lat} and \textbf{lon} vectors. Gaussian grids allow for easier computation of integrals involved in the Fourier and Legendre transforms. 
-\item [Orthogonal Curvilinear Grids] often used for ocean grids. Cannot be described by vectors in lat/lon space, \textbf{lat} and \textbf{lon} must be 2D arrays. Allows for a computationally efficient approach to grids with differing spatial scales. Based on a transformation from a rectangular grid. 
-\end{description}
-
-\subsubsection{Model Components}
-%Add Knutti family tree, one of the images from the bubble diagrams of model components grouped by code size
-See the Software Architecture of Climate Models. 
-\begin{figure}[h]
-\includegraphics[width=\textwidth]{Knutti_family_tree.png}
-\caption{Figure and following caption copied from \cite{knutti_climate_2013}: (a) The model ``family tree" from CMIP3 and CMIP5 (marked with asterisks) control climate plus observations (ERA40/GPCP and NCEP/CMAP), shown as a dendrogram (a hierarchical clustering of the pairwise distance matrix for temperature and precipitation fields, see text). Some of the models with obvious similarities in code or produced by the same institution are marked with the same color. Models appearing in the same branch are close, and similarity is larger the more to the left the branches separate (for a detailed description of the method, see Masson and Knutti [2011]). (b) Same but based on the predicted change in temperature and precipitation fields for the end of the 21st century in the RCP8.5 scenario relative to the control.}
-\end{figure} 
-
-
-\section{Math stuff}
+\section{Mathematical background and derivations}
+\label{app:math}
 High- (i.e.\ the pattern of rain showers) and low-frequency (i.e.\ droughts, extreme precipitation events) patterns of precipitation are affected by different climatological processes, and could therefore react differently to changes in temperature and gas concentrations in addition to having differing impacts on human society. To isolate changes in variability for different precipitation processes, we use spectral density analysis to study variability in different frequency `bands' by decomposing the time series for each model output pixel into it frequency components. To do so, we largely adapt the methodology introduced in \cite{leeds_simulation_2015} and \cite{klavans_influence_2016} based on integrations over power spectra.
 
 Spectral density calculations assume stationarity in the underlying time series, so we first detrend the climatic data. We isolate non-seasonal variability by several data frequency-based deseasonalization methods. Finally, we calculate band-separated variability from power spectra. 
@@ -440,12 +478,17 @@ Given the time series representing precipitation at a single pixel for one exper
 
 Variability contributed by different frequency bands were calculated as above for each run. Then, for each run, the ratio of future / past variability for each frequency band was taken. The standard deviation across runs for this ratio was taken for each frequency band. If the outputted final value of that ratio is within two standard deviations as so calculated of 1 (no change), then the change in variability for that pixel is not considered meaningful. 1200 runs are used by default. 
 
-\section{Frequently Used Input Terms}
+\section{A Few Frequently Used Terms}
 
 \begin{description}
-\item [expArray] a cell array of ...
+\item [modelArray] a cell array of models (explicitly the 3rd section of each filename, and also the subdirectory where each file is found) used to select files to input into functions
+\item [expArray] a cell array of experiments (explicitly the 4th section of each filename) used to select files to input into functions
+\item [run] a shorthand name for the computational run that created a certain file (explicitly the 5th section of each filename)
+\item [frequency band] a segment in frequency space bounded by two frequencies for which variability is calculated
+\item [CMIP5] "Coupled Model Intercomparison Project Phase 5" - a model intercomparison project whose file structure and naming conventions are assumed throughout this code package
 \item [log] (in a function header) logical 0/\texttt{false} or 1/\texttt{true}
 \item [cell] (in a function header) a cell array of strings, numbers, etc.\ (e.g.\ \texttt{\{`rcp85',\dots\}})
+
 \end{description}
 
 

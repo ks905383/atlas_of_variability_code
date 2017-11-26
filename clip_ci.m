@@ -34,12 +34,7 @@ function varargout = clip_ci(var_idx,model,expArray,varargin)
 %   such, IDs and frequency bin sizes need to be equal to those generated
 %   in Variability_CI. 
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
-%
-%   WARNING: This function requires the 'new' (StdDevsRatio struct) file
-%   convention of meaningful pixels; does not work with old (HF_dev_lat,
-%   etc.) convention (which is being phased out anyways).
+%   NOTE: this function is part of the Atlas of Variability code package
 %
 %   See also: VARIABILITY_CI, CLIP_LAT, 
 %
@@ -51,6 +46,7 @@ function varargout = clip_ci(var_idx,model,expArray,varargin)
 warning('off','name_chars:MultConvs'); %Unnecessary if you're clear on what you're doing
 
 %Manage inputs
+various_defaults = matfile('various_defaults.mat');
 filename_add = [];
 spec_freqs = false;
 if nargout > 1
@@ -75,7 +71,7 @@ end
 [~,run,~,~,~] = name_chars(model,expArray,filevar,freq);
 
 %Load _StdDevCI file
-filename_c = strcat('/project/moyer/Kevin/',model,'/',filevar,freq,model,'_',expArray{1},'_',expArray{2},'_',run{1},'StdDevCI',filename_add,'.mat');
+filename_c = strcat(various_defaults.proc_data_dir,model,'/',filevar,freq,model,'_',expArray{1},'_',expArray{2},'_',run{1},'StdDevCI',filename_add,'.mat');
 load(filename_c);
 
 if ~spec_freqs %if using all frequency bins in given _StdDevCI file

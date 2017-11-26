@@ -23,9 +23,9 @@ function varargout = name_chars(model,expArray,filevar,freq,varargin)
 %   x 1 array.
 %
 %   By default, NAME_CHARS searches for a _DATA.mat file in the directory
-%   /project/moyer/CMIP5_Raw/[model]/ of the form
+%   [raw_data_dir]/[model]/ of the form
 %   "[var]_[freq]_[model]_[experiment]_[run]_[dates]_DATA.mat".
-%   or in /project/moyer/CMIP5_Raw/[model]/Seasons_DS6/ for files of the
+%   or in [proc_data_dir]/[model]/[season_dir] for files of the
 %   form
 %   "[var]_[freq]_[model]_[experiment]_[run]_[dates]_sqrtPower_[seas].mat"
 %   for seasonal data.
@@ -40,10 +40,10 @@ function varargout = name_chars(model,expArray,filevar,freq,varargin)
 %       'season',[season],[season_folder]
 %                            - adds '*[season]' to the file search string.
 %                              Optionally change the season folder (in
-%                              /project/moyer/Kevin/[model]) from which to
+%                             [proc_data_dir][model]) from which to
 %                              get and save files by also setting
 %                              [season_folder] = '/[folder name]/' (by
-%                              default '/Seasons_DS6'/). Setting season to
+%                              default [season_dir]). Setting season to
 %                              'all' does not change the running of the
 %                              program.
 %       'start_year',[num/cell] - searches for a specific start year
@@ -107,8 +107,7 @@ function varargout = name_chars(model,expArray,filevar,freq,varargin)
 %   deciding between the two conventions, characteristics for the one
 %   matching total file length to the piControl run are outputted)
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
 %
 %   See also VAR_CHARS
 %
@@ -134,7 +133,7 @@ else
 end
 
 %If expArray is inputted as a single string, convert to cell
-if isa(expArray,'char');
+if isa(expArray,'char')
     expArray = {expArray};
 end
 
@@ -190,7 +189,7 @@ if strcmp(season,'all')
     main_directory = various_defaults.raw_data_dir;
 else
     seas_dir = season_folder;
-    main_directory = '/project/moyer/Kevin/';
+    main_directory = various_defaults.proc_data_dir;
     if ~cust_file_end
         file_end = ['*sqrtPower_',season,'.mat'];
     end
@@ -210,7 +209,7 @@ run = cell(1,num_exps);
 strtyr = cell(1,num_exps);
 endyr = cell(1,num_exps);
 num_conventions = ones(1,num_exps);
-for experiment = 1:num_exps;
+for experiment = 1:num_exps
     %Deal with both cell and individual inputs
     if isa(strtyr_set_tmp,'cell')
         strtyr_set = strtyr_set_tmp{experiment};
@@ -224,7 +223,7 @@ for experiment = 1:num_exps;
     end
     if isa(run_set_tmp,'cell')
         %Add underscore to the run name to keep filename stable
-        if ~isempty(run_set_tmp{experiment});
+        if ~isempty(run_set_tmp{experiment})
             run_set = [run_set_tmp{experiment},'_'];
         else
             run_set = [];
@@ -286,14 +285,14 @@ end
 if match_length
     if length(unique([endyr{:}]-[strtyr{:}]))>1
         if any(num_conventions>1); convs = cell(length(expArray),1);
-            for experiment = 1:length(expArray);
+            for experiment = 1:length(expArray)
                 convs{experiment} = 1:num_conventions(experiment);
             end
             possible_convs = combvec(convs{:})';
             n = 1;
             while length(unique([endyr{:}]-[strtyr{:}]))>1
                 %Break if reached past number of conventions
-                if n > size(possible_convs,1);
+                if n > size(possible_convs,1)
                     warning('name_chars:LengthMismatch',...
                         [model,' ',strjoin(expArray,', '),' runs do not jointly have the same length. Highest convention index combination (',...
                         strjoin(cellfun(@(x) num2str(x),strtyr,'UniformOutput',0),', '),' to ',strjoin(cellfun(@(x) num2str(x),endyr,'UniformOutput',0),', '),...

@@ -14,7 +14,7 @@ function Saves(VarIndices,modelArray,varargin)
 %   variables [lon_bnds] and [lat_bnds] giving the extent of the pixels in
 %   for the geographic grid. 
 %
-%   (All directories mentioned above are set by various_defaults)
+%   (All directories mentioned above are set by [various_defaults.m])
 %
 %   SAVES searches for the primary variable given by the row index of
 %   Varnames.csv inputted as [VarIndices]. If the primary variable name (or
@@ -26,7 +26,9 @@ function Saves(VarIndices,modelArray,varargin)
 %   in which the variables were saved with incorrect or out of convention
 %   filenames. If the difference in filename is known from the start, the
 %   program can be set to specifically look for that different filename
-%   (see flags below). 
+%   (see flags below). If the file is known to not contain [lat_bnds] or
+%   [lon_bnds], or they are not desired in the final output file, use the
+%   flag 'skip_bounds' set to false (see flags below). 
 %
 %   LEAP YEARS: SAVES removes the 366th day from any leap year (by
 %   gregorian or julian leap year standards, for corresponding leap year
@@ -37,17 +39,17 @@ function Saves(VarIndices,modelArray,varargin)
 %   "https://esgf.github.io/esgf-swt/data/2015/08/13/Do-all-CMIP5-models-use-the-same-calendar.html">here</a>)
 %
 %   SUPPORTED DATA FREQUENCIES: daily (including cfDay, etc.), monthly
-%   (including Amon, Lmon, etc.)
+%   (including Amon, Lmon, etc.), and yearly (supporting *ann* and *yrr*)
 %
 %   SUPPORTED/EXPECTED NETCDF FILENAME CONVENTION:
 %       [filevar]_[freq]_[model]_[exp]_[run]_[startdate]_[enddate].nc
-%   with [startdate] and [enddate] being either YYYYMM (monthly data) or 
-%   YYYYMMDD (daily data)
+%   with [startdate] and [enddate] being Y{1-4} (yearly data), YYYYMM
+%   (monthly data), or YYYYMMDD (daily data)
 %
 %   SAVES is designed to minimize memory usage in MATLAB, and by default
 %   extracts the minimum required for the desired time series length from
 %   the netCDF file(s). Total memory used will be slightly more than that
-%   needed for an array of size ~ [(nlon+1) x (nlat+1) x (number time
+%   needed for an array of size ~ [(nlon+1) x (nlat+1) x (number of time
 %   points to save)] (the +1s give an estimate of the size of auxiliary
 %   arrays and other variables used in the saving process). Additionally,
 %   variables are saved in order of size (lat, lon, Raw) to guard against
@@ -201,11 +203,11 @@ if (~isempty(varargin))
                     save_alt = false;
                 end
             case {'save_case'}
-                if strcmp(varargin{in_idx+1},'std');
+                if strcmp(varargin{in_idx+1},'std')
                     save_alt = false;
-                elseif strcmp(varargin{in_idx+1},'alt');
+                elseif strcmp(varargin{in_idx+1},'alt')
                     save_reg = false;
-                elseif strcmp(varargin{in_idx+1},'all');
+                elseif strcmp(varargin{in_idx+1},'all')
                 else
                     warning('Saves:BadCaseInput',[varargin{in_idx+1},' is not a valid save case. Choose "std" or "alt"']);
                 end
@@ -242,7 +244,7 @@ if save_log
 end
 %% 4 Process
 %Set variable
-for i = 1:length(VarIndices);
+for i = 1:length(VarIndices)
     %Define file variable identifiers (filevar == netCDF raw variable name,
     %filevarFN == post-processing variable name. These are not necessarily
     %the same; notably when different elevation bands are included in the
@@ -250,9 +252,9 @@ for i = 1:length(VarIndices);
     %_DATA.mat files)
     [filevar,filevarFN,freq,~,~,~,~,~] = var_chars(VarIndices(i));
     %Set model
-    for j = 1:length(modelArray);
+    for j = 1:length(modelArray)
         %Set experiment
-        for experiment = 1:length(expArray);
+        for experiment = 1:length(expArray)
             %Save current variable state for clearing workspace purposes
             initial_vars = who;
             try
@@ -292,7 +294,7 @@ for i = 1:length(VarIndices);
                 date_ranges=cell(1,num_files);
                 run=cell(1,num_files);
                 %Deconstruct netcdf filename into file characteristics
-                for f=1:num_files;
+                for f=1:num_files
                     Varstr = FileNames(f).name;
                     splitStr = regexp(Varstr,delim,'split');
                     date_ranges{f} = splitStr{6};
@@ -309,14 +311,14 @@ for i = 1:length(VarIndices);
                 
                 %Get start years of each .nc file for this var, model, exp
                 file_strtyrs = zeros(num_files,1);
-                for f = 1:num_files;
+                for f = 1:num_files
                     yrrSplit_strt = regexp(date_ranges{f},delim3,'split');
                     file_strtyrs(f) = str2double(yrrSplit_strt{1}(1:1:min(length(yrrSplit_strt{1}),4)));
                 end
                 %Get index of the file with the latest startdate that still
                 %allows the full desired data length to be extracted
                 [~,first_file] = max(file_strtyrs(files_endyr-file_strtyrs>max(years_to_save,years_to_save_alt)));
-                if isempty(first_file);
+                if isempty(first_file)
                     first_file = 1;
                     warning('Saves:NotEnoughFiles',[num2str(max(years_to_save,years_to_save_alt)),' years of netcdf files not found. ',...
                         'The maximum found date range is ',num2str(file_strtyrs(1)),'-',num2str(files_endyr),...
@@ -350,6 +352,8 @@ for i = 1:length(VarIndices);
                     end
                 elseif strfind(freq,'mon')>0 %Monthly data
                     subyear_units = 12;
+                elseif contains(freq,'ann') || contains(freq,'yrr') %Yearly data
+                    subyear_units = 1;
                 else
                     error('Saves:NoFreqSupport',['Saves.m currently does not support files saved at frequency ',freq])
                 end
@@ -377,17 +381,19 @@ for i = 1:length(VarIndices);
                 %Process irregular start times
                 if length(strtdate)<5
                     sub_startbias = 0;
-                    warning('SAVES:ShortDate',['The start date of the time series for ',...
-                        ' implied by the filename is less than 5 characters long, suggesting it is of the format Y{1-4}. ',...
-                        'Accordingly, it is assumed the time series starts on January 1st / January / etc., and the "startbias" ',...
-                        '(the number of timesteps skipped to correct for non-traditional start dates) is set to 0. Please verify if that feels fishy.'])
-                elseif (~isempty(strfind(freq,'day')) && strcmp(strtdate(5:8),'0101')) || (isempty(strfind(freq,'day')) && strcmp(strtdate(5:6),'01'))
+                    if ~contains(freq,'yrr') && ~contains(freq,'ann') %Y{1-4} is fine for annual data, so no warning is necessary
+                        warning('SAVES:ShortDate',['The start date of the time series for ',...
+                            ' implied by the filename is less than 5 characters long, suggesting it is of the format Y{1-4}. ',...
+                            'Accordingly, it is assumed the time series starts on January 1st / January / etc., and the "startbias" ',...
+                            '(the number of timesteps skipped to correct for non-traditional start dates) is set to 0. Please verify if that feels fishy.'])
+                    end
+                elseif (contains(freq,'day') && strcmp(strtdate(5:8),'0101')) || (contains(freq,'mon') && strcmp(strtdate(5:6),'01'))
                     sub_startbias = 0;
                 else
                     if strfind(freq,'day')>0 %Daily data
                         %If the file starts on a non-traditional (not
                         %01/01) day, start indexing on the next 01/01)
-                        if strcmpi(Calendar,'360_day'); %yearfrac is a financial toolbox function, might not always work
+                        if strcmpi(Calendar,'360_day') %yearfrac is a financial toolbox function, might not always work
                             sub_startbias = yearfrac(strtdate(5:8),'1230',2)*subyear_units; %2 is for actual/360-day calendar
                         else
                             sub_startbias = yearfrac(strtdate(5:8),'1231',3)*subyear_units; %3 is for actual/365-day calendar
@@ -395,7 +401,7 @@ for i = 1:length(VarIndices);
                             %starts at a non-traditional starting date
                             %before Feb 29th, add that day to the (to be
                             %skipped) start bias
-                            if leap_years(1) && str2double(strtdate(5:8)) < 31; %representing 03/01, aka after any potential leap year)
+                            if leap_years(1) && str2double(strtdate(5:8)) < 31 %representing 03/01, aka after any potential leap year)
                                 sub_startbias = sub_startbias+1;
                             end
                         end
@@ -437,7 +443,7 @@ for i = 1:length(VarIndices);
                 %skip, the filename needs to take into account the first
                 %full year that it contains (in other words,
                 %year_startbias+1)
-                if year_startbias~=0; 
+                if year_startbias~=0
                     std_filestrt = files_strtyr+year_startbias+1; 
                 else 
                     std_filestrt = files_strtyr; 
@@ -477,12 +483,12 @@ for i = 1:length(VarIndices);
                     %different, but occasionally are). 
                     if isempty(var_search)
                         if ~isempty(structfind(file_info.Variables,'Name',filevar))
-                            interior_var = filevar; %interior_var = 
+                            interior_var = filevar;
                         else
                             prompt_str = ['The variable "',filevar,'" was not found in ',...
                                 various_defaults.raw_data_dir,modelArray{j},'/',FileNames(1).name,...
                                 '. Please manually select one of the following variables to load by inserting the corresponding integer:\n'];
-                            for nc_var_idxs = 1:length(file_info.Variables);
+                            for nc_var_idxs = 1:length(file_info.Variables)
                                 prompt_str = [prompt_str,'[',num2str(nc_var_idxs),']: ',file_info.Variables(nc_var_idxs).Name,'\n']; %#ok<AGROW>
                             end
                             prompt_str = [prompt_str,'Insert a number to continue with the corresponding variable, or 0 to break. ',...
@@ -553,7 +559,7 @@ for i = 1:length(VarIndices);
                     filename{1} = [various_defaults.raw_data_dir,modelArray{j},'/',filevar,freq,modelArray{j},'_',expArray{experiment},'_',run{1},'_',date_ranges{1},'.nc'];
                     Raw{1} = ncread(filename{1},filevar,idx_strt1,idx_count1);
                     %Fully load intermediate files
-                    for f = 2:num_files-1;
+                    for f = 2:num_files-1
                         filename{f} = [various_defaults.raw_data_dir,modelArray{j},'/',filevar,freq,modelArray{j},'_',expArray{experiment},'_',run{f},'_',date_ranges{f},'.nc'];
                         Raw{f} = ncread(filename{f},filevar,idx_interm_i,idx_interm_count);
                     end
@@ -575,7 +581,7 @@ for i = 1:length(VarIndices);
                     %For subsequent years, start index at next value from last
                     %of previous in common years, last value + 1 for the
                     %preceding being a leap year (thereby skipping it)
-                    for y = 2:(files_endyr-files_strtyr+1-year_startbias+year_endbias);
+                    for y = 2:(files_endyr-files_strtyr+1-year_startbias+year_endbias)
                         idxs_tmp{y} = (max(idxs_tmp{y-1})+leap_years(year_startbias+y-1)+1):(max(idxs_tmp{y-1})+leap_years(year_startbias+y-1))+subyear_units;
                     end
                     %Turn indices into single vector
@@ -606,7 +612,7 @@ for i = 1:length(VarIndices);
                     else
                         aux_vars = {'lat','lon','lat_bnds','lon_bnds'};
                     end
-                    for aux_var_idx = 1:length(aux_vars);
+                    for aux_var_idx = 1:length(aux_vars)
                         if isempty(var_search)
                             if ~isempty(structfind(file_info.Variables,'Name',aux_vars{aux_var_idx}))
                                 outputs.(aux_vars{aux_var_idx}) = ncread(filename{1},aux_vars{aux_var_idx});
@@ -614,7 +620,7 @@ for i = 1:length(VarIndices);
                                 prompt_str = ['The variable "',aux_vars{aux_var_idx},'" was not found in ',...
                                     various_defaults.raw_data_dir,modelArray{j},'/',FileNames(1).name,...
                                     '. Please manually select one of the following variables to load as "',aux_vars{aux_var_idx},'" by inserting the corresponding integer:\n'];
-                                for nc_var_idxs = 1:length(file_info.Variables);
+                                for nc_var_idxs = 1:length(file_info.Variables)
                                     prompt_str = [prompt_str,'[',num2str(nc_var_idxs),']: ',file_info.Variables(nc_var_idxs).Name,'\n']; %#ok<AGROW>
                                 end
                                 prompt_str = [prompt_str,'Insert a number to continue with the corresponding variable, or 0 to break. ',...
@@ -642,6 +648,10 @@ for i = 1:length(VarIndices);
                     %% 4.7.6 Save files
                     %Save longer time series
                     if years_to_save_alt >= years_to_save && calc_alt
+                        if ~exist([various_defaults.proc_data_dir,modelArray{j},alt_folder],'file')
+                            mkdir([various_defaults.proc_data_dir,modelArray{j},alt_folder])
+                            disp([various_defaults.proc_data_dir,modelArray{j},alt_folder,' did not yet exist, and was created.'])
+                        end
                         save([filename_alt,filename_add],'-struct','outputs',version)
                         disp([filename_alt,filename_add,' ',version,' saved'])
                         calc_alt = false; %make sure not saved twice
@@ -665,6 +675,10 @@ for i = 1:length(VarIndices);
                     
                     %Save shorter time series
                     if years_to_save >= years_to_save_alt && calc_alt
+                        if ~exist([various_defaults.proc_data_dir,modelArray{j},alt_folder],'file')
+                            mkdir([various_defaults.proc_data_dir,modelArray{j},alt_folder])
+                            disp([various_defaults.proc_data_dir,modelArray{j},alt_folder,' did not yet exist, and was created.'])
+                        end
                         save([filename_alt,filename_add],'-struct','outputs',version)
                         disp([filename_alt,filename_add,' ',version,' saved'])
                     elseif calc_reg

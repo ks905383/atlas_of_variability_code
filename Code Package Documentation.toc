@@ -12,32 +12,27 @@
 \contentsline {subsection}{\numberline {3.1}Calculating Frequency Contributions to Variability}{7}{subsection.3.1}
 \contentsline {subsection}{\numberline {3.2}Calculating Seasonal Variability}{8}{subsection.3.2}
 \contentsline {subsection}{\numberline {3.3}Calculating Variability Ratios}{8}{subsection.3.3}
-\contentsline {subsection}{\numberline {3.4}Getting Confidence Intervals on Variability Changes}{8}{subsection.3.4}
-\contentsline {section}{\numberline {4}Mapping Results}{9}{section.4}
+\contentsline {subsection}{\numberline {3.4}Calculating Confidence Intervals on Variability Changes}{9}{subsection.3.4}
+\contentsline {section}{\numberline {4}Mapping Results}{10}{section.4}
+\contentsline {subsection}{\numberline {4.1}Mapping ratios of variability changes}{10}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Mapping some summary statistics}{10}{subsection.4.2}
 \contentsline {section}{\numberline {5}Graphing Results}{10}{section.5}
-\contentsline {section}{\numberline {6}Auxiliary Functions}{10}{section.6}
-\contentsline {subsection}{\numberline {6.1}Loading calculated data}{10}{subsection.6.1}
-\contentsline {subsubsection}{\numberline {6.1.1}Loading data from \texttt {\_sqrtPower.mat} files}{10}{subsubsection.6.1.1}
-\contentsline {subsubsection}{\numberline {6.1.2}Loading data from \texttt {\_LocalMeans.mat} files}{10}{subsubsection.6.1.2}
-\contentsline {subsection}{\numberline {6.2}Subsetting data by region, value, etc.}{10}{subsection.6.2}
-\contentsline {subsubsection}{\numberline {6.2.1}Clipping data by region}{11}{subsubsection.6.2.1}
-\contentsline {subsubsection}{\numberline {6.2.2}Clipping data by latitude band}{12}{subsubsection.6.2.2}
-\contentsline {subsubsection}{\numberline {6.2.3}Clipping variability data by significance}{12}{subsubsection.6.2.3}
-\contentsline {section}{\numberline {7}Additional Functions / Files}{12}{section.7}
-\contentsline {subsection}{\numberline {7.1}Background Functions}{12}{subsection.7.1}
-\contentsline {subsection}{\numberline {7.2}Third Party/Community Functions}{12}{subsection.7.2}
-\contentsline {section}{\numberline {8}Typical Code Run}{12}{section.8}
-\contentsline {section}{\numberline {A}Conventions, Names, etc. Typically Found in Model-World}{14}{appendix.A}
-\contentsline {subsection}{\numberline {A.1}Typical Model Experiments}{14}{subsection.A.1}
-\contentsline {subsubsection}{\numberline {A.1.1}Transient vs. Equilibrated Model Runs}{14}{subsubsection.A.1.1}
-\contentsline {subsubsection}{\numberline {A.1.2}The Representative Concentration Pathways (RCPs)}{14}{subsubsection.A.1.2}
-\contentsline {subsection}{\numberline {A.2}Typical Model Technical Details}{14}{subsection.A.2}
-\contentsline {subsubsection}{\numberline {A.2.1}Some Model Grids}{14}{subsubsection.A.2.1}
-\contentsline {subsubsection}{\numberline {A.2.2}Model Components}{14}{subsubsection.A.2.2}
-\contentsline {section}{\numberline {B}Math stuff}{14}{appendix.B}
-\contentsline {subsection}{\numberline {B.1}Detrending and Deseasonalization}{15}{subsection.B.1}
-\contentsline {subsubsection}{\numberline {B.1.1}Daily Data}{15}{subsubsection.B.1.1}
-\contentsline {subsubsection}{\numberline {B.1.2}Monthly Data}{15}{subsubsection.B.1.2}
-\contentsline {subsection}{\numberline {B.2}Spectral Analysis}{16}{subsection.B.2}
-\contentsline {subsection}{\numberline {B.3}Bootstrap Procedure}{17}{subsection.B.3}
-\contentsline {section}{\numberline {C}Frequently Used Input Terms}{17}{appendix.C}
+\contentsline {subsection}{\numberline {5.1}Subsetting data by region, value, etc.}{11}{subsection.5.1}
+\contentsline {subsubsection}{\numberline {5.1.1}Clipping data by region}{11}{subsubsection.5.1.1}
+\contentsline {subsubsection}{\numberline {5.1.2}Clipping data by latitude band}{12}{subsubsection.5.1.2}
+\contentsline {subsubsection}{\numberline {5.1.3}Clipping variability data by significance}{12}{subsubsection.5.1.3}
+\contentsline {section}{\numberline {6}Auxiliary Functions}{12}{section.6}
+\contentsline {subsection}{\numberline {6.1}Loading calculated data}{12}{subsection.6.1}
+\contentsline {subsubsection}{\numberline {6.1.1}Loading data from \texttt {\_sqrtPower.mat} files}{13}{subsubsection.6.1.1}
+\contentsline {subsubsection}{\numberline {6.1.2}Loading data from \texttt {\_LocalMeans.mat} files}{13}{subsubsection.6.1.2}
+\contentsline {subsection}{\numberline {6.2}Getting subsets of arrays}{13}{subsection.6.2}
+\contentsline {subsection}{\numberline {6.3}Getting a human-readable location description}{13}{subsection.6.3}
+\contentsline {section}{\numberline {7}Third Party/Community Functions}{13}{section.7}
+\contentsline {section}{\numberline {8}Typical Code Run}{14}{section.8}
+\contentsline {section}{\numberline {A}Mathematical background and derivations}{15}{appendix.A}
+\contentsline {subsection}{\numberline {A.1}Detrending and Deseasonalization}{15}{subsection.A.1}
+\contentsline {subsubsection}{\numberline {A.1.1}Daily Data}{15}{subsubsection.A.1.1}
+\contentsline {subsubsection}{\numberline {A.1.2}Monthly Data}{16}{subsubsection.A.1.2}
+\contentsline {subsection}{\numberline {A.2}Spectral Analysis}{16}{subsection.A.2}
+\contentsline {subsection}{\numberline {A.3}Bootstrap Procedure}{18}{subsection.A.3}
+\contentsline {section}{\numberline {B}A Few Frequently Used Terms}{18}{appendix.B}

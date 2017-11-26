@@ -45,7 +45,7 @@
 %
 %   Data requirements: [_DATA.mat] files for each variable, experiment,
 %                      model in the folder given by [folder_seasons] (by
-%                      default .../[model]/Seasons_DS6/)
+%                      default [raw_data_dir]/[model]/Seasons_DS6/)
 %   Function requirements (on path): name_chars, var_chars
 %
 %   VARIABILITY_SEASONS(...,'[flag]',[params],...) modify program run as
@@ -120,24 +120,27 @@
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last modified 10/13/2016
+%   Last modified 11/26/2017
 function Variability_seasons(VarIndices,modelArray,varargin)
 
 %Set clock (for logging purposes)
 format shortG
 startTimestamp = clock;
+tic
 
 %% Set default values and setup program
+various_defaults = matfile('various_defaults.mat');
 replace_files = true;
 num_models = length(modelArray);
 num_harmonics=12;
 expArray = {'rcp85','historical','piControl'};
 num_exps = length(expArray);
 multi_proc = true; num_proc = 12; batch_processing = false;
-pc_jobstorloc = strcat('/tmp/kschwarzwald/', getenv('SLURM_JOB_ID'));
+%pc_jobstorloc = strcat('/tmp/kschwarzwald/', getenv('SLURM_JOB_ID'));
+pc_jobstorloc = strcat(various_defaults.tmp_dir,randi(10000));
 filename_add = [];
 save_log = false;
-folder = '/Seasons_DS6/';
+folder = various_defaults.season_dir;
 
 %Seasonal Setup
 seasonArray = {'JJA','DJF'};
@@ -194,8 +197,10 @@ if (~isempty(varargin))
                 daily_num_bands = size(daily_freq_bands,1); freq_idx_day = 1:daily_num_bands;
             case {'multi_processor'}
                 multi_proc = varargin{in_idx+1};
-                if multi_proc == true;
+                if multi_proc == true
                     num_proc = varargin{in_idx+2};
+                else
+                	num_proc = 0;
                 end
             case {'batch_processing'}
                 batch_processing = true;
@@ -209,7 +214,7 @@ end
 
 %% Initialize Multi-Processor Computing
 if multi_proc
-    if isempty(gcp('nocreate'));
+    if isempty(gcp('nocreate'))
         % create a local cluster object
         pc = parcluster('local');
         
@@ -230,17 +235,17 @@ if save_log
 end
 
 %% Calculate Variability
-for i=1:length(VarIndices);
+for i=1:length(VarIndices)
     %Define file variable identifiers
     [~,filevarFN,freq,~,~,~,~,~] = var_chars(VarIndices(i));
-    if strcmp(freq,'_day_'); freq_def = 1; year_length = 365; else freq_def = 2; year_length = 12; end %(To get correct frequency - day/month - info from arrays above)
+    if regexp(freq,'.[Dd]ay.'); freq_def = 1; year_length = 365; else freq_def = 2; year_length = 12; end %(To get correct frequency - day/month - info from arrays above)
     
-    for j=1:num_models;
+    for j=1:num_models
         %Process Data by Experiment
-        for experiment = 1:num_exps;
+        for experiment = 1:num_exps
             
             %Get file names/characteristics of files of inputted var/exp/model
-            [~,~,~,~,num_conventions] = name_chars(modelArray{j},expArray(experiment),filevarFN,freq,'directory',['/project/moyer/Kevin/',modelArray{j},'/Seasons_DS/']);
+            [~,~,~,~,num_conventions] = name_chars(modelArray{j},expArray(experiment),filevarFN,freq,'directory',[various_defaults.proc_data_dir,modelArray{j},various_defaults.season_dir]);
             
             if num_conventions == 0
                 warningMsg = ['Files for ',modelArray{j},' ',expArray{experiment},' all seasons ',filevarFN,freq,' were not processed! (missing file)'];
@@ -252,8 +257,8 @@ for i=1:length(VarIndices);
             end
             
             %% Process Data
-            for conv = 1:num_conventions;
-                [~,run,strtyr,endyr,~] = name_chars(modelArray{j},expArray(experiment),filevarFN,freq,'use_convention',conv,'directory',['/project/moyer/Kevin/',modelArray{j},'/Seasons_DS/']);
+            for conv = 1:num_conventions
+                [~,run,strtyr,endyr,~] = name_chars(modelArray{j},expArray(experiment),filevarFN,freq,'use_convention',conv,'directory',[various_defaults.proc_data_dir,modelArray{j},various_defaults.season_dir]);
                 
                 for season = 1:length(seasonArray)
                     try
@@ -267,7 +272,7 @@ for i=1:length(VarIndices);
                             %if season crosses over a year boundary, total
                             %number of seasons ("years") will be one less
                             %than years in file
-                            if (strcmp(freq,'_day_') && seasonStart{freq_def,season}+season_length>365) || (~strcmp(freq,'_day_') && seasonStart{freq_def,season}+season_length>12)
+                            if (regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>365) || (~regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>12)
                                 years = prefTimeframe{season}-1; %years = how many seasons in time series
                             else %if season doesn't go over a year boundary
                                 years = prefTimeframe{season};
@@ -275,7 +280,7 @@ for i=1:length(VarIndices);
                             %years = 30;
                             startbias = 0;
                         elseif endyr{1}-strtyr{1}+1>prefTimeframe{season} %if _DATA file is longer than needed for specific season (taking last [xx] years wanted)
-                            if (strcmp(freq,'_day_') && seasonStart{freq_def,season}+season_length>365) || (~strcmp(freq,'_day_') && seasonStart{freq_def,season}+season_length>12)
+                            if (regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>365) || (~regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>12)
                                 years = prefTimeframe{season}-1; %years = how many seasons in time series
                             else %if season doesn't go over a year boundary
                                 years = prefTimeframe{season};
@@ -283,7 +288,7 @@ for i=1:length(VarIndices);
                             startbias = endyr{1}-strtyr{1}+1-prefTimeframe{season};
                         else %if _DATA file is shorter than preferred
                             %if season crosses a year boundary
-                            if (strcmp(freq,'_day_') && seasonStart{freq_def,season}+season_length>365) || (~strcmp(freq,'_day_') && seasonStart{freq_def,season}+season_length>12)
+                            if (regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>365) || (~regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>12)
                                 years = endyr{1}-strtyr{1};
                             else %if season doesn't go over a year boundary
                                 years = endyr{1}-strtyr{1}+1;
@@ -294,8 +299,8 @@ for i=1:length(VarIndices);
                         
                         %Define final filenames for existence testing and
                         %saving
-                        filename1SD = ['/project/moyer/Kevin/',modelArray{j},folder,filevarFN,freq,modelArray{j},'_',expArray{experiment},'_',run{1},num2str(strtyr_seas),'-',num2str(endyr{1}),'_sqrtPower_',seasonArray{season}];
-                        filename1Mean = ['/project/moyer/Kevin/',modelArray{j},folder,filevarFN,freq,modelArray{j},'_',expArray{experiment},'_',run{1},num2str(strtyr_seas),'-',num2str(endyr{1}),'_LocalMeans_',seasonArray{season}];
+                        filename1SD = [various_defaults.proc_data_dir,modelArray{j},folder,filevarFN,freq,modelArray{j},'_',expArray{experiment},'_',run{1},num2str(strtyr_seas),'-',num2str(endyr{1}),'_sqrtPower_',seasonArray{season}];
+                        filename1Mean = [various_defaults.proc_data_dir,modelArray{j},folder,filevarFN,freq,modelArray{j},'_',expArray{experiment},'_',run{1},num2str(strtyr_seas),'-',num2str(endyr{1}),'_LocalMeans_',seasonArray{season}];
                         
                         %Decide whether calculations or replacements are needed
                         if replace_files %If replace_files, calculate and fully replace file
@@ -303,14 +308,14 @@ for i=1:length(VarIndices);
                         else %If ~replace_files, find out whether the file exists, and if so, whether the wanted bands exist
                             if exist([filename1SD,'.mat'],'file')
                                 load(filename1SD);
-                                if strcmp(freq,'_Amon_'); %Find out which frequency bands already have completed calculations
+                                if regexp(freq,'.[Mm]on.') %Find out which frequency bands already have completed calculations
                                     bands_exist = cell(monthly_num_bands,1);
                                     for band_test = 1:monthly_num_bands
                                         bands_exist{band_test} = structfind(StdDevs,'Size',monthly_freq_bands(band_test,:));
                                     end
                                 else
                                     bands_exist = cell(daily_num_bands,1);
-                                    for band_test = 1:daily_num_bands;
+                                    for band_test = 1:daily_num_bands
                                         bands_exist{band_test} = structfind(StdDevs,'Size',daily_freq_bands(band_test,:));
                                     end
                                 end
@@ -322,7 +327,7 @@ for i=1:length(VarIndices);
                                 if any(cellfun('isempty',bands_exist)) %If not all wanted bands exist, calculated, but add to file instead of replacing it
                                     calc = true; append_calcs = true;
                                     if ~all(cellfun('isempty',bands_exist)) %Subset to only needed bands
-                                        if ~strcmp(freq,'_day_');[~,idx_tmp] = ismember(monthly_freq_bands,cell2mat({StdDevs.Size}'),'rows'); freq_idx_month = find(~idx_tmp); clear idx_tmp
+                                        if ~regexp(freq,'.[Dd]ay.');[~,idx_tmp] = ismember(monthly_freq_bands,cell2mat({StdDevs.Size}'),'rows'); freq_idx_month = find(~idx_tmp); clear idx_tmp
                                         else [~,idx_tmp] = ismember(daily_freq_bands,cell2mat({StdDevs.Size}'),'rows'); freq_idx_day = find(~idx_tmp); clear idx_tmp
                                         end
                                     end
@@ -335,7 +340,7 @@ for i=1:length(VarIndices);
                         end
                         
                         if calc
-                            filename = ['/project/moyer/Kevin/',modelArray{j},'/Seasons_DS/',filevarFN,freq,modelArray{j},'_',expArray{experiment},'_',run{1},num2str(strtyr{1}),'-',num2str(endyr{1}),'_DATA'];
+                            filename = [various_defaults.proc_data_dir,modelArray{j},various_defaults.season_dir,filevarFN,freq,modelArray{j},'_',expArray{experiment},'_',run{1},num2str(strtyr{1}),'-',num2str(endyr{1}),'_DATA'];
                             load(filename);
                             
                             %Get length of dimensions
@@ -361,7 +366,7 @@ for i=1:length(VarIndices);
                             %Get seasonal means of Raw data
                             LocalMean = mean(Raw(:,:,seas_idxs),3); %#ok<NASGU> %Local means over all seasons
                             
-                            if strcmp(freq,'_day_') %(data is daily)
+                            if regexp(freq,'.[Dd]ay.') %(data is daily)
                                 freq_idx = freq_idx_day;
                                 freq_bands = daily_freq_bands(freq_idx,:); num_bands = size(freq_bands,1);
                                 freq_band_names = daily_freq_band_names(freq_idx);
@@ -375,7 +380,7 @@ for i=1:length(VarIndices);
                                 X = [X0 X_c X_s];
                                 
                                 %% Detrend and Deseasonalize
-                                parfor l=1:nlon
+                                parfor (l=1:nlon,num_proc)
                                     %Detrend
                                     Y = detrend(squeeze(Raw(l,:,:))')';
                                     %Deseasonalize
@@ -397,7 +402,7 @@ for i=1:length(VarIndices);
                                     %Detrend
                                     Y = detrend(squeeze(Raw(l,:,:))')';
                                     %Take Average of each Month over the Time Series
-                                    for n=1:12;
+                                    for n=1:12
                                         MonAvgs(l,:,n) = mean(Y(:,n:12:rge),2);
                                     end
                                     %Remove Average of each Month from Time Series to Deseasonalize
@@ -413,8 +418,8 @@ for i=1:length(VarIndices);
                             end
                             clear Raw
                             %% Get Power Spectrum and Mean
-                            parfor l=1:nlon
-                                for t=1:years;
+                            parfor (l=1:nlon, num_proc)
+                                for t=1:years
                                     %Mean of each (deseasonalized) season
                                     LocalMeans_season(l,:,t) = mean(squeeze(Raw_seasons(l,:,t,:)),2);
                                     %DFT each season separately
@@ -443,7 +448,7 @@ for i=1:length(VarIndices);
                                 [~,freq_bands_idxs(band,2)] = min(abs(freq_bands(band,2)-period));
                                 %If sequential, make sure a frequency is not
                                 %double-counted
-                                if band>1 && freq_bands_idxs(band,1) == freq_bands_idxs(band-1,2);
+                                if band>1 && freq_bands_idxs(band,1) == freq_bands_idxs(band-1,2)
                                     freq_bands_idxs(band,1) = freq_bands_idxs(band,1)-1;
                                 end
                                 %Preallocate matrix
@@ -537,7 +542,7 @@ if save_log
     complete_log = complete_log';
     complete_log = complete_log(:);
     export_log = cell2table(complete_log,'VariableNames',{'VariabilitySeasonCalcs_attempted_executions'});
-    writetable(export_log,['~/CalcLogs/Variability_seasons_log_',num2str(startTimestamp(1)),'-',num2str(startTimestamp(2)),'-',num2str(startTimestamp(3)),'-',num2str(startTimestamp(4)),'-',num2str(startTimestamp(5)),'-',num2str(startTimestamp(6)),'.txt']);
+    writetable(export_log,[various_defaults.log_dir,'Variability_seasons_log_',num2str(startTimestamp(1)),'-',num2str(startTimestamp(2)),'-',num2str(startTimestamp(3)),'-',num2str(startTimestamp(4)),'-',num2str(startTimestamp(5)),'-',num2str(startTimestamp(6)),'.txt']);
 end
 toc
 end

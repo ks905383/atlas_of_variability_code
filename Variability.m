@@ -26,8 +26,12 @@ function Variability(VarIndices,modelArray,varargin)
 %       MF      5-30        -
 %       LF      30-365      1-12
 %       XF      > 1 yr      > 1 yr      saved as [12,Inf] or [365,Inf]
-%       Full    all         all         saved as [0,Inf] or [0 Inf] by
-%                                       convention
+%       Full    all         all         saved as [0,Inf] by convention
+%		2to15	2-15		- 			
+%		15to90	15-90		- 
+%		XXF		- 			12-120
+%		XXXF	-			> 10 yrs	saved as [120,Inf] by convention
+%
 %
 %   Sample Output for 2-band + overall monthly [_sqrtPower] file:
 %   StdDevs.Name = {'< 1 year';'> 1 year';'all bands'};
@@ -81,10 +85,10 @@ function Variability(VarIndices,modelArray,varargin)
 %                                         [0,5;5,30;30,365;365,Inf;0,Inf],
 %                                         and [ID] =
 %                                         {'HF','MF','LF','XF','Full'});
-%       'multi_processor',[log],[#]     - set whether to use multiple
+%       'multi_processor',[log],([#])   - set whether to use multiple
 %                                         processors and set number of [#]
-%                                         processors to be used (def: true,
-%                                         12)
+%                                         processors to be used if true 
+%										  (def: true,12)
 %       'batch_processing',[log]        - sets job storage location
 %                                         explicitly at
 %                                         /tmp/kschwarzwald/[SLURMJOBID]
@@ -94,7 +98,7 @@ function Variability(VarIndices,modelArray,varargin)
 %                             true)
 %       'save_log'          - exports log of attempted saves with
 %                             success/failure status under
-%                             ~/CalcLogs/Variability_log_[starttime].txt
+%                             [log_dir]/Variability_log_[starttime].txt
 %       'testing'           - adds '_TEST' to end of filename
 %
 %   Saving convention:
@@ -120,14 +124,13 @@ function Variability(VarIndices,modelArray,varargin)
 %         bands using [num_splits]) is [1 longitude band] x [num latitudes]
 %         x [num timesteps] for vectorization purposes).
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
 %
 %   See also VARIABILITY_CI, VARIABILITY_SEASONS
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last modified 09/06/2017
+%   Last modified 11/26/2017
 
 %% 1 Misc Setup
 % Allow for string input (as opposed to cell) for model name
@@ -139,17 +142,21 @@ startTimestamp = clock;
 start_msg = ['\nVariability calculations run, \nstarted at ',...
     num2str(startTimestamp(4)),':',num2str(startTimestamp(5)),':',num2str(fix(startTimestamp(6))),...
     ' on ',num2str(startTimestamp(2)),'/',num2str(startTimestamp(3)),'/',num2str(startTimestamp(1)),...
-    ',\nfor variables [',num2str(VarIndices),'] \nand models ',sprintf('%s ',modelArray{:}),'\nGood Luck! :) \n ',quoteme,' \n \n \n'];
+    ',\nfor variable indices [',num2str(VarIndices),'] \nand models ',sprintf('%s ',modelArray{:}),'\nGood Luck! :) \n ',quoteme,' \n \n \n'];
 fprintf(start_msg)
 
 %% 2 Set default values and set up program
+%Get stored defaults
+various_defaults = matfile('various_defaults.mat');
+%Set other default options
 replace_files = true;
 num_models = length(modelArray);
 num_harmonics=12; remove_locavg = true;
 expArray = {'rcp85','historical','piControl'};
 num_exps = length(expArray);
 multi_proc = true; num_proc = 12; batch_processing = false;
-pc_jobstorloc = strcat('/tmp/kschwarzwald/', getenv('SLURM_JOB_ID'));
+%pc_jobstorloc = strcat('/tmp/kschwarzwald/', getenv('SLURM_JOB_ID'));
+pc_jobstorloc = strcat(various_defaults.tmp_dir,randi(10000));
 save_log = false;
 filename_add = [];
 num_splits = 1;
@@ -159,7 +166,6 @@ file_end = '*DATA.mat';
 
 %Frequency band determinants default settings (taken from various_defaults)
 cust_freqs = false;
-various_defaults = matfile('various_defaults.mat');
 freq_band_setup = various_defaults.freq_band_setup;
 
 %% 3 Set behavior of optional function flags
@@ -188,8 +194,10 @@ if (~isempty(varargin))
                 num_splits = varargin{in_idx+1};
             case {'multi_processor'}
                 multi_proc = varargin{in_idx+1};
-                if multi_proc == true;
+                if multi_proc == true
                     num_proc = varargin{in_idx+2};
+                else
+                	num_proc = 0;
                 end
             case {'batch_processing'}
                 batch_processing = true;
@@ -206,7 +214,7 @@ end
 
 %% 4 Initialize Multi-Processor Computing
 if multi_proc
-    if isempty(gcp('nocreate'));
+    if isempty(gcp('nocreate'))
         % create a local cluster object
         pc = parcluster('local');
         
@@ -231,16 +239,16 @@ if save_log
 end
 
 %% 5 Calculate Variability
-for var_idx=1:length(VarIndices);
+for var_idx=1:length(VarIndices)
     %Define file variable identifiers
     [~,filevarFN,freq] = var_chars(VarIndices(var_idx));
     
     %Set up freq bands and deseasonalization, depending on frequency (if
     %not custom)
-    if ~cust_freqs;
-        if regexp(freq,'.[Dd]ay.');
+    if ~cust_freqs
+        if regexp(freq,'.[Dd]ay.')
             freq_char_id = find(~cellfun(@isempty,strfind(freq_band_setup(:,1),'day')));
-        elseif regexp(freq,'.[Mm]on.');
+        elseif regexp(freq,'.[Mm]on.')
             freq_char_id = find(~cellfun(@isempty,strfind(freq_band_setup(:,1),'month')));
         elseif regexp(freq,'.yrr.')
             freq_char_id = find(~cellfun(@isempty,strfind(freq_band_setup(:,1),'year')));
@@ -257,10 +265,10 @@ for var_idx=1:length(VarIndices);
         num_bands = size(freq_bands,1);
     end
     
-    for model_idx=1:num_models;
+    for model_idx=1:num_models
         model = modelArray{model_idx};
         %Process Data by Experiment
-        for exp_id = 1:num_exps;
+        for exp_id = 1:num_exps
             initial_vars = who;
             experiment = expArray{exp_id};
             try
@@ -273,16 +281,16 @@ for var_idx=1:length(VarIndices);
                         ', variable: ',filevarFN,', and frequency: ',freq])
                 end
                 %% 5.2 Process Data
-                for conv = 1:num_conventions;
+                for conv = 1:num_conventions
                     %% 5.2.1 Define filenames
                     [~,run,strtyr,endyr,~] = name_chars(model,expArray(exp_id),filevarFN,freq,'use_convention',conv,'file_end',file_end);
                     
                     %Define final filenames (any filename_add such as '_TEST' is added at the end to not interfere with existence testing)
-                    filename1SD = ['/project/moyer/Kevin/',model,'/',filevarFN,freq,model,'_',experiment,'_',run{1},num2str(strtyr{1}),'-',num2str(endyr{1}),'_sqrtPower',file_end_save];
-                    filename1Mean = ['/project/moyer/Kevin/',model,'/',filevarFN,freq,model,'_',experiment,'_',run{1},num2str(strtyr{1}),'-',num2str(endyr{1}),'_LocalMeans',file_end_save];
+                    filename1SD = [various_defaults.proc_data_dir,model,'/',filevarFN,freq,model,'_',experiment,'_',run{1},num2str(strtyr{1}),'-',num2str(endyr{1}),'_sqrtPower',file_end_save];
+                    filename1Mean = [various_defaults.proc_data_dir,model,'/',filevarFN,freq,model,'_',experiment,'_',run{1},num2str(strtyr{1}),'-',num2str(endyr{1}),'_LocalMeans',file_end_save];
                     %Make save directory, if it does not yet exist
-                    if ~exist(['/project/moyer/Kevin/',model,'/'],'file')
-                        mkdir(['/project/moyer/Kevin/',model,'/'],'file')
+                    if ~exist([various_defaults.proc_data_dir,model,'/'],'file')
+                        mkdir([various_defaults.proc_data_dir,model,'/'],'file')
                     end
                     
                     %% 5.2.2 Decide whether calculations or replacements are needed
@@ -321,12 +329,12 @@ for var_idx=1:length(VarIndices);
                     %% 5.2.3 Calculate variability, if needed
                     if calc
                         %% 5.2.3.1 Load data and pre-allocate arrays
-                        filename = ['/project/moyer/CMIP5_Raw/',model,'/',filevarFN,freq,model,'_',experiment,'_',run{1},num2str(strtyr{1}),'-',num2str(endyr{1}),'_DATA'];
+                        filename = [various_defaults.raw_data_dir,model,'/',filevarFN,freq,model,'_',experiment,'_',run{1},num2str(strtyr{1}),'-',num2str(endyr{1}),'_DATA'];
                         %Get matfile object of _DATA
                         load_file = matfile([filename,'.mat']);
                         %Get dimensions of data
                         load_file_vars = whos(load_file);
-                        if isempty(structfind(load_file_vars,'name','Raw'));
+                        if isempty(structfind(load_file_vars,'name','Raw'))
                             error('VARIABILITY:NoRawVar',['No variable of the name "Raw" found in the file ',filename,'.mat. I would suggest running /Code/File_Utilities/filevar_Raw_fixes.m; the likely cause is an old file system convention.']) 
                         end
                         nlon = load_file_vars(structfind(load_file_vars,'name','Raw')).size(1);
@@ -366,7 +374,7 @@ for var_idx=1:length(VarIndices);
                             [~,freq_bands_idxs(band,2)] = min(abs(freq_bands(band,2)-period));
                             %If sequential, make sure a frequency is not
                             %double-counted
-                            if band>1 && freq_bands_idxs(band,1) == freq_bands_idxs(band-1,2);
+                            if band>1 && freq_bands_idxs(band,1) == freq_bands_idxs(band-1,2)
                                 freq_bands_idxs(band,1) = freq_bands_idxs(band,1)-1;
                             end
                             %Preallocate matrix
@@ -400,10 +408,9 @@ for var_idx=1:length(VarIndices);
                             tic
                             
                             %% 5.2.3.2b Detrend and Deseasonalize, depending on frequency
-                            if ~isempty(regexp(freq,'.[Dd]ay.', 'once')) || ~isempty(regexp(freq,'.3hr.','once')); %(data is daily)
+                            if ~isempty(regexp(freq,'.[Dd]ay.', 'once')) || ~isempty(regexp(freq,'.3hr.','once')) %(data is daily)
                                 %% Detrend and Deseasonalize
-                                %parfor (lon_idx=1:length(lon_i:lon_f),num_proc)
-                                parfor lon_idx = 1:length(lon_i:lon_f)
+                                parfor (lon_idx=1:length(lon_i:lon_f),num_proc)
                                     %Calculate Local Means (tmp file
                                     %because of parfor requirements)
                                     LocalMean_tmp(lon_idx,:) = mean(Raw(lon_idx,:,:),3);
@@ -427,7 +434,7 @@ for var_idx=1:length(VarIndices);
                                     %Detrend
                                     Y = detrend(squeeze(Raw(lon_idx,:,:))')';
                                     %Take Average of each Month over the Time Series
-                                    for n=1:12;
+                                    for n=1:12
                                         MonAvgs(lon_idx,:,n) = mean(Y(:,n:12:rge),2);
                                     end
                                     %Remove Average of each Month from Time Series to Deseasonalize
@@ -577,7 +584,7 @@ end
 %% 6 Export log as table, if desired
 if save_log
     export_log = cell2table(complete_log','VariableNames',{'VariabilityCalcs_attempted_executions'});
-    writetable(export_log,['/home/kschwarzwald/CalcLogs/Variability_log_',num2str(startTimestamp(1)),'-',num2str(startTimestamp(2)),'-',num2str(startTimestamp(3)),'-',num2str(startTimestamp(4)),'-',num2str(startTimestamp(5)),'-',num2str(startTimestamp(6)),'.txt']);
+    writetable(export_log,[various_defaults.log_dir,'/Variability_log_',num2str(startTimestamp(1)),'-',num2str(startTimestamp(2)),'-',num2str(startTimestamp(3)),'-',num2str(startTimestamp(4)),'-',num2str(startTimestamp(5)),'-',num2str(startTimestamp(6)),'.txt']);
 end
 
 end

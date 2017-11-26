@@ -1,15 +1,13 @@
-function Maps_stddev_ci(VarIndices,modelArray,varargin)
-% MAPS_STDDEV_CI    Map changes in variability.
+function Maps_ratio(VarIndices,modelArray,varargin)
+% MAPS_RATIO    Map changes in variability.
 %
-%   MAPS_STDDEV_CI(VarIndices,modelArray) creates a set of maps showing the
+%   MAPS_RATIO(VarIndices,modelArray) creates a set of maps showing the
 %   ratio of variability between two experiments (by default RCP8.5 and
 %   piControl) globally of variables given by [VarIndices] for models given
 %   by [modelArray], separated by frequency bands. By default, all
 %   frequency bands but data for 'all freqs' (the basic standard deviation)
-%   are plotted (in other words, 2 frequencies for most monthly and 4
-%   frequencies for most daily data, based on primarily-used conventions).
-%   Maps are saved as .eps files in
-%   /project/moyer/Kevin/FinalFigs/[VarDomain]/.
+%   are plotted. Maps are saved as .eps files in
+%   [figure_dir]/FinalFigs/[VarDomain]/.
 %
 %   Resulting figure is by default configured for 11" x 8" (792 x 576 pts).
 %
@@ -17,22 +15,17 @@ function Maps_stddev_ci(VarIndices,modelArray,varargin)
 %   various_defaults.mat
 %
 %   Required data: a *SpectralRatios.mat file with data in the
-%   proc_data_dir from various_defaults containing the ratios of the
+%   [proc_data_dir] from [various_defaults.m] containing the ratios of the
 %   desired variables; if using polygon mapping, then a .nc file in the
-%   raw_data_dir with the same lat/lon grid as the data, containing
-%   variables lat_bnds and lon_bnds (if these are not available, lat/lon
-%   bounds are constructed from prevailing lat/lon grid, details below).
+%   [raw_data_dir] with the same lat/lon grid as the data, containing
+%   variables [lat_bnds] and [lon_bnds] (if these are not available,
+%   lat/lon bounds are constructed from prevailing lat/lon grid, details
+%   below).
 %
-%   MAPS_STDDEV_CI(...,'[flag]',[params],...) modify program run as below:
-%       'mark_ci'           - mark pixels not meaningfully different from 1
-%                             with a gray cross (additionally requires a
-%                             _StdDevCI file for each variable/model)
-%       'ci_marker_size',[int] - set size of ci cross (default 0.2)
+%   MAPS_RATIO(...,'[flag]',[params],...) modify program run as below:
 %       'experiments',[cell]- set experiments between which ratio is
 %                             plotted (requires _sqrtPower for both
 %                             experiments) (def; {'rcp85','piControl'})
-%       'seasons',[cell]    - set seasonal data to be plotted (i.e.
-%                             {'DJF'})
 %       'show_freqs',[cell] - set frequency bands to graph, either 'all' or
 %                             a cell array of either desired frequency band
 %                             sizes ([cell] = {5,30,365...}) or IDs ([cell]
@@ -40,6 +33,12 @@ function Maps_stddev_ci(VarIndices,modelArray,varargin)
 %                             but full (all frequencies) bands). If only
 %                             one frequency is used, the filename is
 %                             extended by the '_[ID]'.
+%       'mark_ci'           - mark pixels not meaningfully different from 1
+%                             with a gray cross (additionally requires a
+%                             _StdDevCI file for each variable/model)
+%       'ci_marker_size',[int] - set size of ci cross (default 0.2)
+%       'seasons',[cell]    - set seasonal data to be plotted (i.e.
+%                             {'DJF'})
 %       'scale_by',[char]   - by default 'log10', set the colormap scaling.
 %                             Ticks will still be in raw units, but the
 %                             scale will change. Options are 'log10',
@@ -142,8 +141,7 @@ function Maps_stddev_ci(VarIndices,modelArray,varargin)
 %                                           (_[lat lims]_[lon lims)...
 %                                                                     .eps
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
 %
 %   KNOWN BUGS/ETC.: If there are weird smears, white lines, etc. in your
 %   map, it's probably related to the process of wrapping to 360. In
@@ -160,6 +158,7 @@ function Maps_stddev_ci(VarIndices,modelArray,varargin)
 %   Last modified 06/26/2017
 
 %% 1. Set Defaults
+various_defaults = matfile('various_defaults.mat');
 %Set clock (for logging purposes)
 format shortG
 startTimestamp = clock;
@@ -169,7 +168,7 @@ expArray = {'rcp85','piControl'};
 seasArray = {'all'};
 use_freqs = {'all_but_full'};
 all_freqs = false;
-season_folder = 'Seasons_DS6';
+season_folder = various_defaults.season_dir;
 
 %Set figure defaults
 plot_method = 'pcolor';
@@ -318,12 +317,10 @@ if ~iscell(modelArray)
 end
 
 %% 2. Setup Graph Characteristics
-%Load directory / labeling defaults
-various_defaults = matfile('/project/moyer/Kevin/Code/various_defaults.mat');
 
 %Set experiment markers
 exp_marker = cell(2,1);
-for i = 1:2;
+for i = 1:2
     try
         exp_marker(i) = various_defaults.expArray_disp(find(cellfun(@(x) strcmp(expArray{i},x),various_defaults.expArray_disp(:,1))),2); %#ok<FNDSB>
     catch
@@ -332,14 +329,14 @@ for i = 1:2;
 end
 
 %Define colormap
-load('standard_colormaps')
+standard_colormaps = matfile('standard_colormaps');
 %Set colormap
 if color_split
-    colormap_ratios = ColorRtWtB(1:(256/colorbar_bands):256,:); 
+    colormap_ratios = standard_colormaps.ColorRtWtB(1:(256/colorbar_bands):256,:); 
     %Make sure colormap is white on both sides of 0
     colormap_ratios = [colormap_ratios(2:colorbar_bands/2+1,:); colormap_ratios(colorbar_bands/2+1,:); colormap_ratios(colorbar_bands/2+2:end,:)];
 else
-    colormap_ratios = ColorRtWtB; 
+    colormap_ratios = standard_colormaps.ColorRtWtB; 
 end
 
 %Set colorbar and tickmarks
@@ -348,8 +345,8 @@ if strcmp(scale_by,'log10')
 elseif strcmp(scale_by,'log')
     lTicks = log(Ticks); c_lim = clim_tmp;
 elseif strcmp(scale_by,'raw')
-    if isequal(Ticks,[0.01 0.02 0.05 0.1 0.2 0.5 1 2 5 10 20 50 100]); lTicks = [0 0.5 1 1.5 2]; else lTicks = Ticks; end
-    if isequal(clim_tmp,[-0.5 0.5]); c_lim = [0.5 1.5]; else c_lim = clim_tmp; end 
+    if isequal(Ticks,[0.01 0.02 0.05 0.1 0.2 0.5 1 2 5 10 20 50 100]); lTicks = [0 0.5 1 1.5 2]; else; lTicks = Ticks; end
+    if isequal(clim_tmp,[-0.5 0.5]); c_lim = [0.5 1.5]; else; c_lim = clim_tmp; end 
 end
 %Round tickmarks to 3 sig figs
 Ticks = round(Ticks,3,'significant');
@@ -374,7 +371,7 @@ for i = 1:length(VarIndices)
                 %Get run characteristics from filenames
                 if strcmp(seasArray{seas},'all')
                     season_file_add = []; folder = '/'; season_desc = [];
-                else season_file_add = ['_',seasArray{seas}]; folder = ['/',season_folder,'/'];
+                else; season_file_add = ['_',seasArray{seas}]; folder = ['/',season_folder,'/'];
                     season_desc = seasArray{seas};
                 end
                 
@@ -408,7 +405,7 @@ for i = 1:length(VarIndices)
                     %Fix polygon bug with different latitude vector
                     %conventions that causes entire figure to be grey
                     if strcmp(plot_method,'polygon')
-                       if lat(1) > 0;
+                       if lat(1) > 0
                            lat = flipud(lat);
                            for idx = 1:length(StdDevsRatio)
                               StdDevsRatio(idx).Data = fliplr(StdDevsRatio(idx).Data);  %#ok<AGROW>
@@ -420,14 +417,14 @@ for i = 1:length(VarIndices)
                     if strcmp(plot_method,'polygon')
                         nc_files = dir([various_defaults.raw_data_dir,modelArray{j},'/*.nc']);
                         derive_bnds = true;
-                        if ~isempty(nc_files);
+                        if ~isempty(nc_files)
                             n = 1; file_nlat = []; file_nlon = [];
                             %Cycle through candidate .nc files to find
                             %matching lat/lon grid (by length of lats/lons)
                             while ~(isequal(file_nlat,size(lat,1)) && isequal(file_nlon,size(lon,1)))
                                 %Break if reached past number of possible
                                 %.nc files to scan
-                                if n > length(nc_files);
+                                if n > length(nc_files)
                                     %Since derive_bnds is already true, the
                                     %warning below will take care of it
                                     break
@@ -477,10 +474,10 @@ for i = 1:length(VarIndices)
                             lat_bnds = zeros(length(lat),2);
                             lon_bnds = zeros(length(lon),2);
                             %Have support for different lat/lon counters
-                            if lat(1) < 0; lat_bnds(1,1) = -90; else lat_bnds(1,1) = 90; end
+                            if lat(1) < 0; lat_bnds(1,1) = -90; else; lat_bnds(1,1) = 90; end
                             %Interpolate lat boundaries by taking the
                             %average of subsequent pixels
-                            for lat_idx = 1:length(lat)-1;
+                            for lat_idx = 1:length(lat)-1
                                 lat_bnds(lat_idx,2) = (lat(lat_idx+1)-lat(lat_idx))/2+lat(lat_idx);
                                 if lat_idx < length(lat) && lat_idx>1
                                     lat_bnds(lat_idx,1) = lat_bnds(lat_idx-1,2);
@@ -488,13 +485,13 @@ for i = 1:length(VarIndices)
                             end
                             %Set last element
                             lat_bnds(length(lat),1) = lat_bnds(length(lat)-1,2);
-                            if lat(length(lat)) < 0; lat_bnds(length(lat),2) = -90; else lat_bnds(length(lat),2) = 90; end
+                            if lat(length(lat)) < 0; lat_bnds(length(lat),2) = -90; else; lat_bnds(length(lat),2) = 90; end
                             
                             %Have support for different lat/lon counters
                             if lon(1) < 0; lon_bnds(1,1) = -180; elseif lon(1) ==0; lon_bnds(1,1) = 0; elseif lon(1)>0; lon_bnds(1,1) = 180;end
                             %Interpolate lat boundaries by taking the
                             %average of subsequent pixels
-                            for lon_idx = 1:length(lon)-1;
+                            for lon_idx = 1:length(lon)-1
                                 lon_bnds(lon_idx,2) = (lon(lon_idx+1)-lon(lon_idx))/2+lon(lon_idx);
                                 if lon_idx < length(lon) && lon_idx>1
                                     lon_bnds(lon_idx,1) = lon_bnds(lon_idx-1,2);
@@ -513,7 +510,7 @@ for i = 1:length(VarIndices)
                         %Generate struct for each pixel
                         clear struct_poly
                         struct_poly(length(lon)*length(lat)).Lat = 0;  %#ok<AGROW>
-                        for poly_idx = 1:length(lon)*length(lat);
+                        for poly_idx = 1:length(lon)*length(lat)
                             [lon_idx,lat_idx] = ind2sub([length(lon) length(lat)],poly_idx);
                             struct_poly(poly_idx).Lat = [lat_bnds(lat_idx,1); lat_bnds(lat_idx,2); lat_bnds(lat_idx,2); lat_bnds(lat_idx,1); lat_bnds(lat_idx,1);NaN];
                             struct_poly(poly_idx).Lon = [lon_bnds(lon_idx,1); lon_bnds(lon_idx,1); lon_bnds(lon_idx,2); lon_bnds(lon_idx,2); lon_bnds(lon_idx,1);NaN];
@@ -538,7 +535,7 @@ for i = 1:length(VarIndices)
                     %Decide which frequency bands to graph
                     if ~all_freqs
                         if isa(use_freqs{1},'char') && strcmp(use_freqs{1},'all_but_full')
-                            if ~isempty(strfind([freq_band_ids{:}],'Full'))
+                            if contains([freq_band_ids{:}],'Full')
                                 [~,bands,~] = setxor(freq_band_ids,{'Full'});
                             else
                                 bands = 1:length(StdDevsRatio);
@@ -547,7 +544,7 @@ for i = 1:length(VarIndices)
                             for s_idx = 1:length(use_freqs)
                                 if ~isempty(structfind(StdDevsRatio,'ID',use_freqs{s_idx}))
                                     bands(s_idx) = structfind(StdDevsRatio,'ID',use_freqs{s_idx});
-                                else error('MapsStdDev:NoFreq',['The frequency band identified by ',use_freqs{s_idx},' does not exist in the SpectralRatios file.',...
+                                else; error('MapsStdDev:NoFreq',['The frequency band identified by ',use_freqs{s_idx},' does not exist in the SpectralRatios file.',...
                                         ' Please choose one or more of the following IDs: ',strjoin({StdDevsRatio(:).ID})])
                                 end
                             end
@@ -603,8 +600,8 @@ for i = 1:length(VarIndices)
                         %if lon doesn't start counting from 0). Ideally
                         %this should also prevent the white line, but this
                         %doesn't seem to fully be the case yet...
-                            if lon(1) < 0; first_last(1) = 360+lon(1); else first_last(1) = lon(1); end
-                            if lon(end) < 0; first_last(2) = 360+lon(end); else first_last(2) = lon(end); end
+                            if lon(1) < 0; first_last(1) = 360+lon(1); else; first_last(1) = lon(1); end
+                            if lon(end) < 0; first_last(2) = 360+lon(end); else; first_last(2) = lon(end); end
                             lon = [lon' mean(first_last)];
                         end
                         lonWrapped = wrapTo360(lon);
@@ -635,7 +632,7 @@ for i = 1:length(VarIndices)
                             plot_colors = data_colormap(plot_data,colorbar_bands,'colormap',colormap_ratios,'range',c_lim);
                             color_atts = makesymbolspec('Polygon',{'INDEX',[1 numel(struct_poly)],'FaceColor',plot_colors,'LineStyle','none'});
                         else
-                            error('MapsStdDevCI:IncorrectPlotMethod','Incorrect plot method. Must be "polygon" or "pcolor"')
+                            error('MapsRatio:IncorrectPlotMethod','Incorrect plot method. Must be "polygon" or "pcolor"')
                         end
                         
                         
@@ -652,7 +649,7 @@ for i = 1:length(VarIndices)
                                 map_lon_lim = [double(min(lon(:))) double(max(lon(:)))];
                                 [~,tmp_inda] = min(lon(:));
                                 [~,tmp_indb] = max(lon(:));
-                                if tmp_indb<tmp_inda;
+                                if tmp_indb<tmp_inda
                                     map_lon_lim = fliplr(map_lon_lim);
                                     map_lon_lim(map_lon_lim<0) = 360-(180+map_lon_lim(map_lon_lim<0));
                                 end
@@ -708,7 +705,7 @@ for i = 1:length(VarIndices)
                     %% 3.2.5 Annotate Figure
                     if show_caption
                         %Set caption descriptions
-                        AnnotateString = [freqdesc,vardesc,' ',season_desc,newline,modelArray{j},char(10)];
+                        AnnotateString = [freqdesc,vardesc,' ',season_desc,newline,modelArray{j},newline];
                         if mark_ci
                             AnnotateString = [AnnotateString,'Gray crosses show pixels not meaningfully different from 1']; %#ok<AGROW>
                         end
@@ -735,6 +732,11 @@ for i = 1:length(VarIndices)
                     figure1.PaperPosition = [0 0 pointsx pointsy];
                     if ~isempty(filename_add)
                         filenameS = [filenameS,filename_add]; %#ok<AGROW>
+                    end
+                    
+                    if ~exist(save_dir,'file') || save_eps || save_fig || save_png
+                        mkdir(save_dir)
+                        warning([save_dir,' was not found, and was created.'])
                     end
                     
                     if save_eps
@@ -773,7 +775,7 @@ for i = 1:length(VarIndices)
                     complete_log{(i-1)*length(modelArray)+j,seas} = save_log_wrn;
                 end
                 if break_on_error
-                    error('MAPS_STDDEV_CI:break',['Graph for ',seasArray{seas},' ',modelArray{j},' ',filevarFN,freq,' not created!'])
+                    error('MAPS_RATIO:break',['Graph for ',seasArray{seas},' ',modelArray{j},' ',filevarFN,freq,' not created!'])
                 else
                     warningMsg = ['Graph for ',seasArray{seas},' ',modelArray{j},' ',filevarFN,freq,' not created!'];
                     warning(warningMsg);
@@ -793,6 +795,6 @@ if save_log
     complete_log = complete_log';
     complete_log = complete_log(:);
     export_log = cell2table(complete_log','VariableNames',{'VariabilityMaps_attempted_executions'});
-    writetable(export_log,['/home/kschwarzwald/CalcLogs/Maps_stddev_ci_log_',num2str(startTimestamp(1)),'-',num2str(startTimestamp(2)),'-',num2str(startTimestamp(3)),'-',num2str(startTimestamp(4)),'-',num2str(startTimestamp(5)),'-',num2str(startTimestamp(6)),'.txt']);
+    writetable(export_log,['/home/kschwarzwald/CalcLogs/MAPS_RATIO_log_',num2str(startTimestamp(1)),'-',num2str(startTimestamp(2)),'-',num2str(startTimestamp(3)),'-',num2str(startTimestamp(4)),'-',num2str(startTimestamp(5)),'-',num2str(startTimestamp(6)),'.txt']);
 end
 end

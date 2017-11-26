@@ -63,8 +63,14 @@ function varargout = var_chars(var_idx,varargin)
 delim1 = '\_';
 
 %Load file with variable characteristics
-VarnamesFile = fopen('/project/moyer/Kevin/Varnames.csv');
-Varnames = textscan(VarnamesFile,'%s','Delimiter',',');
+various_defaults = matfile('various_defaults.mat');
+VarnamesFile = fopen([various_defaults.code_dir,'Varnames.csv']);
+if VarnamesFile<0
+    error('VAR_CHARS:NoVarnames',['Could not find the file Varnames.csv in ',...
+        various_defaults.code_dir,'. Please ensure this file exists at this location.'])
+else
+    Varnames = textscan(VarnamesFile,'%s','Delimiter',',');
+end
 fclose(VarnamesFile);
 Varnames = reshape(Varnames{1},[8 (length(Varnames{1})/8)]);
 
@@ -74,7 +80,7 @@ if isa(var_idx,'char')
     if ~isempty(strfind(var_idx,'_'));
         idx_tmp = regexp(var_idx,delim1,'split');
         var_idx = idx_tmp{1};
-        if isempty(varargin);
+        if isempty(varargin)
             varargin{1} = idx_tmp{2};
         end
     end
@@ -113,28 +119,28 @@ units = Varnames{5,var_idx};
 varunits = Varnames{6,var_idx};
 data_type = Varnames{7,var_idx};
 
-if regexp(freq,'.[Dd]ay.');
+if regexp(freq,'.[Dd]ay.')
 	freqdesc='Daily ';
 	frequnit=365;
-elseif regexp(freq,'.[Mm]on.');
+elseif regexp(freq,'.[Mm]on.')
 	freqdesc='Monthly ';
 	frequnit=12;
-elseif regexp(freq,'.yrr.');
+elseif regexp(freq,'.yrr.')
     freqdesc = 'Yearly ';
     frequnit = 1;
-elseif regexp(freq,'.3hr.');
+elseif regexp(freq,'.3hr.')
     freqdesc = '3-hour ';
     frequnit = 2920;
-elseif regexp(freq,'.6hr.');
+elseif regexp(freq,'.6hr.')
     freqdesc = '6-hour ';
     frequnit = 1460;
-elseif regexp(freq,'.12hr.');
+elseif regexp(freq,'.12hr.')
     freqdesc = '12-hour ';
     frequnit = 730;
 end
 
 varargout{1} = filevar; varargout{2} = filevarFN; varargout{3} = freq;
-if nargout > 3;
+if nargout > 3
     varargout{4} = vardesc; varargout{5} = units; varargout{6} = varunits;
     varargout{7} = data_type; varargout{8} = freqdesc; varargout{9} = frequnit;
 end

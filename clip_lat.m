@@ -28,8 +28,7 @@ function varargout = clip_lat(lat_min,lat_max,lat,lon,varargin)
 %   netcdf files. [idx] is a num_vars x 1 cell array of indices to be added
 %   to.
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
 %
 %   See also CLIP_REGION
 %
