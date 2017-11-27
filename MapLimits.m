@@ -71,11 +71,14 @@ function MapLimits(VarIndices,modelArray,varargin)
 %
 %   NOTE: this function is part of the Atlas of Variability code package
 %
+%   All directories listed as [____] are set in various_defaults.m
+%
 %   See also: MAPS_DIAGNOSTICS (for applications)
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
 %   Last modified 11/26/2017
+%
 %   SUGGESTION - SIMPLIFY CODE BY CHANGING ALL OF THIS TO A LOOP OVER
 %   OPERATIONS (i.e. {'nanmean','nanstd','nanmedian','mad'}, for evals, but
 %   then using dynamic struct names, IntermodelStats.([str]) to save). THIS

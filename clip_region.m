@@ -68,8 +68,8 @@ function varargout = clip_region(region_id,varargin)
 %
 %   Data requirements: the file 'regions.mat'; if at least one of the
 %   desired regions is of type 'OCEAN' or 'LAND', a file 'sftlf*.mat' in
-%   the folder /project/moyer/Kevin/[model]/ with a nlon x nlat array
-%   'sftlf' giving the percentage of each pixel that is land for that model
+%   the folder [proc_data_dir]/[model]/ with a nlon x nlat array 'sftlf'
+%   giving the percentage of each pixel that is land for that model
 %   (CLIP_REGION now supports multiple grids per model, as long as the
 %   corresponding land fraction file is of the form "sftlf*.mat" in the
 %   folder CLIP_REGION will cycle through files until the grid matches the
@@ -80,7 +80,7 @@ function varargout = clip_region(region_id,varargin)
 %   larger)).
 %
 %   To add regions: edit the struct 'Regions' contained in
-%   .../Code/regions.mat. Input max and min lat and lon values in the
+%   [code_dir]/regions.mat. Input max and min lat and lon values in the
 %   corresponding fields, and, in the field 'Type', whether the region is
 %   'LAND', 'OCEAN', or 'ALL' (if 'all', no contours are followed, the
 %   resulting region is just a lat-lon rectangle). 'ID' is an easily
@@ -94,6 +94,8 @@ function varargout = clip_region(region_id,varargin)
 %   Gallegos, Argentina). 
 %
 %   NOTE: this function is part of the Atlas of Variability code package
+%
+%   All directories listed as [____] are set in various_defaults.m
 %
 %   See also CLIP_LAT, CLIP_CI, CLIP_VAR_MIN,
 %

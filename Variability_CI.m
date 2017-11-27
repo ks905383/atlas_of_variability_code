@@ -96,19 +96,17 @@ function Variability_CI(VarIndices,modelArray,varargin)
 %   Saving convention:
 %   [filevar]_[freq]_[model]_[exp1]_[exp2]_[run]_StdDevsCI.mat
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
 %
-%   NOTE: THE CONFIDENCE INTERVALS ARE TAKEN FROM THE PURE RATIO - SHOULD
-%   PROBABLY CHANGE TO LOG RATIOS FOR SYMMETRY?
+%   All directories listed as [____] are set in various_defaults.m
 %
-%   ESTIMATED RUNTIMES: 
+%   NOTE: THE CONFIDENCE INTERVALS ARE TAKEN FROM THE PURE RATIO
 %
 %   See also VARIABILITY, VARIABILITY_SEASONS
 %   
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last modified 12/12/2016 NOT FULLY DEBUGGED YET
+%   Last modified 12/12/2016 PARTIALLY IN BETA
 
 %Load defaults
 various_defaults = matfile('various_defaults.mat');

@@ -67,12 +67,13 @@ Function Name&Type&Description\\ \hline
 \texttt{load\_means}&Aux&Load files, file subsets, and characteristics of mean data\\
 \texttt{Maps\_ratio}&Mapping&Map changes in variability\\ 
 \texttt{Maps\_diagnostics}&Mapping&Map diagnostics/summary statistics of a variable\\
+\texttt{MapLimits}&Aux&Set colorbar limits across models for consistent plots\\
 \texttt{data\_colormap}&Aux&Assign colors to array elements\\
 \texttt{clip\_lat}&Aux&Get indices of pixels within a latitude range\\
 \texttt{clip\_region}&Aux&Get indices of pixels within a geographic region\\
 \texttt{clip\_ci}&Aux&Get indices of pixels with non-significant variability changes\\
-\texttt{clip\_minval}&Aux&Get indices of pixels above a certain value\\
-\texttt{clip\_maxval}&Aux&Get indices of pixels below a certain value\\
+\texttt{clip\_var\_min}&Aux&Get indices of pixels above a certain value\\
+\texttt{clip\_var\_max}&Aux&Get indices of pixels below a certain value\\
 \texttt{subset\_find}&Aux&Find indices of one array within another\\
 \texttt{subplot\_pos}&Aux&A collection of figure-friendly subplot positions\\
 \texttt{loc\_descriptor}&Aux&Get human-readable political description of a lat/lon pair\\
@@ -249,6 +250,7 @@ Beyond the general functional form (as always, check the function header through
 \end{description}
 
 \subsection{Mapping some summary statistics}
+\label{func:maps_diagnostics}
 In addition to \texttt{Maps\_ratio.m}, this package also includes the mapping function \texttt{Maps\_diagnostics.m}, which creates a set of 4-panel maps showing 1) mean values for \textit{exp$_1$}, 2) \textit{exp$_1$} standard deviations, 3) difference in mean values \textit{exp$_2$} - \textit{exp$_1$}, and 4) ratio of standard deviations $\frac{exp_2}{exp_1} $for a variable - model combination. By default, \textit{exp$_1$} and \textit{exp$_2$} are \texttt{piControl} and \texttt{rcp85}, respectively. See the function header for more detail. 
 
 \texttt{Maps\_diagnostics.m} requires color limits across models that it takes from running \texttt{MapLimits.m}. \texttt{MapLimits.m} creates a file with intermodel statistics that allow for a consistent intermodel colormap creation (these are \textit{not} rigorous summary statistics). See the function header for more detail.
@@ -368,6 +370,7 @@ The following shows an example code run from start to finish analyzing the relat
 \item run \texttt{Variability(5,\{`CSIRO-Mk3-6-0'\},`experiments',\{`rcp85',`historical',`piControl'\})} (Section \ref{func:Variability.m}) to calculate integrated spectral densities, means, and standard deviations
 \item run \texttt{SpectralRatios(5,\{`CSIRO-Mk3-6-0'\},`experiments',\{`rcp85',`piControl'\})} and \texttt{SpectralRatios(5,\{`CSIRO-Mk3-6-0'\},`experiments',\{`rcp85',`historical'\})} (Section \ref{func:SpectralRatios.m}) to save variability ratios
 \item run \texttt{Maps\_ratio(5,\{`CSIRO-Mk3-6-0'\}, `experiments',\{`rcp85',`piControl'\},}\\ \texttt{`show\_freqs',\{`HF',`MF',`mean',`LF'\})} and \texttt{Maps\_ratio(5,\{`CSIRO-Mk3-6-0'\}, \\`experiments',\{`rcp85',`historical'\}, `show\_freqs',\{`HF',`MF',`mean',`LF'\})} (Section \ref{func:Maps_ratio.m}) to map the $<$ 5 day variability, 5 - 30 day variability, mean, and 30 - 365 day variability changes in daily precipitation between RCP8.5 and PI control and RCP8.5 and historical runs
+\item run \texttt{Maps\_diagnostics(5,\{`CSIRO-Mk3-6-0'\}, `experiments',\{`piControl',`rcp85'\})} (Section \ref{func:maps_diagnostics}) to map the pre-industrial mean and standard deviation, the mean change RCP8.5 - PI control and the ratio of standard deviations RCP8.5 / PI control for daily precipitation
 \item run \texttt{panel\_plots(5, \{`CSIRO-Mk3-6-0'\}, `experiments', \{`rcp85',`piControl'\}, `show\_freqs', \{`LF',`XF'\}, `clip\_lat',30,55, `color\_by',`data', \{`piControl'\}, \{`mean'\}, `log10')} (Section \ref{func:Plots_Log_Panel_prod.m})\footnote{in beta} to create a scatterplot of variability changes vs.\ mean changes for 30 - 365 day and $>$ 1 year variability (in 2 subplots) in the mid-latitudes ($\abs{30^\circ-55^\circ}$), colored by the base-10 log of pre-industrial mean precipitation
 \end{enumerate}
 

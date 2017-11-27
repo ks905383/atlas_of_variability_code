@@ -36,7 +36,9 @@ function varargout = clip_ci(var_idx,model,expArray,varargin)
 %
 %   NOTE: this function is part of the Atlas of Variability code package
 %
-%   See also: VARIABILITY_CI, CLIP_LAT, 
+%   All directories listed as [____] are set in various_defaults.m
+%
+%   See also: VARIABILITY_CI, CLIP_LAT, CLIP_REGION
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu

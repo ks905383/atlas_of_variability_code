@@ -46,12 +46,12 @@ elseif num_subs <= 6 && num_subs > 4
     pointsy = 792; pointsx = 576;
     colorbar_pos = [];
     position_set_alt = position_set;
-elseif num_subs > 6;
+elseif num_subs > 6
     error('subplot_pos:NotSupported',['subplot_pos currently only supports up to 6 subplots, ',num2str(num_subs),' (inputted) is too many.'])
 end
 
 varargout{1} = position_set;
-if nargout > 1;
+if nargout > 1
     varargout{2} = pointsx;
     varargout{3} = pointsy;
     varargout{4} = colorbar_pos;

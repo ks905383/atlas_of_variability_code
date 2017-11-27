@@ -126,6 +126,8 @@ function Variability(VarIndices,modelArray,varargin)
 %
 %   NOTE: this function is part of the Atlas of Variability code package
 %
+%   All directories listed as [____] are set in various_defaults.m
+%
 %   See also VARIABILITY_CI, VARIABILITY_SEASONS
 %
 %   For questions/comments, contact Kevin Schwarzwald

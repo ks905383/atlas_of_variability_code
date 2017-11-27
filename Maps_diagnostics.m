@@ -2,17 +2,17 @@ function Maps_diagnostics(VarIndices,modelArray,varargin)
 % MAPS_DIAGNOSTICS  Map various parameters, coll. known as 'pi diagnostics'
 %
 %   MAPS_DIAGNOSTICS(VarIndices,modelArray) creates a set of 4-panel maps
-%   showing 1) PI mean values, 2) PI standard deviations, 3) difference in
-%   mean values RCP8.5-PI, and 4) ratio of standard deviations RCP8.5/PI
-%   for each of the variables defined by [VarIndices] and models defined by
-%   [modelArray]. Maps are saved as .eps files in
+%   showing (by default) 1) PI mean values, 2) PI standard deviations, 3)
+%   difference in mean values RCP8.5-PI, and 4) ratio of standard
+%   deviations RCP8.5/PI for each of the variables defined by [VarIndices]
+%   and models defined by [modelArray]. Maps are saved as .eps files in
 %   [figure_dir]/[VarDomain]/PI_Diagnostics/.
 %   
 %   Warnings are thrown if graphs are not created for a specific
-%   model/variable pair or if RCP and PI calculations cover differing
-%   timeframes, but run continues. Warnings are also thrown if a
-%   searched-for file does not exist (from NAME_CHARS output, with all
-%   corresponding behavior). 
+%   model/variable pair or if the calculations of the two different
+%   experiments cover differing timeframes, but run continues. Warnings are
+%   also thrown if a searched-for file does not exist (from NAME_CHARS
+%   output, with all corresponding behavior).
 %
 %   Colorbar limits are defined by setting values across models using
 %   MapLimits.m, taken from the resulting 'IntermodelStats' files. 
@@ -45,12 +45,14 @@ function Maps_diagnostics(VarIndices,modelArray,varargin)
 %       'testing'           - adds '_TEST' to filename
 %       'save_log'          - exports log of attempted saves with
 %                             success/failure status under
-%                             ~/CalcLogs/MAPS_DIAGNOSTICS_log_[starttime].txt
+%                             [calc_dir]/MAPS_DIAGNOSTICS_log_[starttime].txt
 %
 %   Saving convention: 
 %   [filevar]_[freq]_[model]_[exp2]_[exp1]_Diag_Maps(_[season]).eps   
 %
 %   NOTE: this function is part of the Atlas of Variability code package
+%
+%   All directories listed as [____] are set in various_defaults.m
 %
 %   See also NAME_CHARS, 
 %   
@@ -186,20 +188,20 @@ for i = 1:length(VarIndices)
     
     %Set colormaps and colormap limits for local mean map (different based
     %on variable characteristics)
-    if strcmp(clim_type,'percent')==1;
+    if strcmp(clim_type,'percent')==1
         colormap1=colormap_gray;
         if IntermodelStats{1}(mean_idx(1)).std/IntermodelStats(mean_idx(1)).mean+4*IntermodelStats{1}(mean_idx(1)).std<60;
             clim1=[0 IntermodelStats{1}(mean_idx(1)).std/IntermodelStats(mean_idx(1)).mean+4*IntermodelStats{1}(mean_idx(1)).std];
         else
             clim1=[0 100];
         end
-    elseif strcmp(clim_type,'ratio')==1;
+    elseif strcmp(clim_type,'ratio')==1
         colormap1=colormap_gray;
         clim1=[0 IntermodelStats{1}(mean_idx(1)).mean+4*IntermodelStats{1}(mean_idx(1)).std];
-    elseif strcmp(clim_type,'interval')==1;
+    elseif strcmp(clim_type,'interval')==1
         colormap1=colormap_ratios;
         clim1=[-4*IntermodelStats{1}(mean_idx(1)).std 4*IntermodelStats{1}(mean_idx(1)).std];
-    elseif strcmp(clim_type,'temp')==1;
+    elseif strcmp(clim_type,'temp')==1
         colormap1=colormap_ratios;
         clim1=[273-3*IntermodelStats{1}(mean_idx(1)).std 273+3*IntermodelStats{1}(mean_idx(1)).std];
     end
@@ -268,7 +270,7 @@ for i = 1:length(VarIndices)
                 MeansDiff = Means(2).Raw - Means(1).Raw;
                 StdDevRatio = StdDevs(2).Raw(full_idx(2)).Data./StdDevs(1).Raw(full_idx(1)).Data;
                 
-                if strcmp(modelArray{j},'CCSM4')==1 && (strcmp(filevarFN,'cllow')==1 || strcmp(filevarFN,'clmed')==1 || strcmp(filevarFN,'clhi')==1);
+                if strcmp(modelArray{j},'CCSM4')==1 && (strcmp(filevarFN,'cllow')==1 || strcmp(filevarFN,'clmed')==1 || strcmp(filevarFN,'clhi')==1)
                     MeansDiff = 100*MeansDiff;
                     Means(1).Raw = 100*Means(1).Raw;
                     StdDevs(1).Raw(full_idx(1)).Data = 100*StdDevs(1).Raw(full_idx(1)).Data;

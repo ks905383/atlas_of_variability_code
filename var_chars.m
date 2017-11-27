@@ -5,7 +5,7 @@ function varargout = var_chars(var_idx,varargin)
 %   designated (post-processed) variable name [filevarFN], and the
 %   frequency [freq] of the climate variable described by [var_idx] (if
 %   [var_idx] is an integer, this corresponds to the [var_idx]th row in
-%   /project/moyer/Kevin/Varnames.csv. If [var_idx] is a string, VAR_CHARS
+%   [code_dir]/Varnames.csv. If [var_idx] is a string, VAR_CHARS
 %   will find the row in Varnames.csv whose second column (post-processed
 %   variable name) matches [var_idx]. If more than one frequency is found
 %   for the string-set variable, a warning is given, and the first (by row
@@ -50,8 +50,9 @@ function varargout = var_chars(var_idx,varargin)
 %   "va", while it is pre-processed in this filesystem into an independent
 %   variable "va850". For more info, see the program Saves.m (link below).
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
+%
+%   All directories listed as [____] are set in various_defaults.m
 %
 %   See also NAME_CHARS, SAVES
 %   

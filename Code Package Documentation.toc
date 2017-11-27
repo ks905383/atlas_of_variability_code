@@ -30,9 +30,9 @@
 \contentsline {section}{\numberline {7}Third Party/Community Functions}{13}{section.7}
 \contentsline {section}{\numberline {8}Typical Code Run}{14}{section.8}
 \contentsline {section}{\numberline {A}Mathematical background and derivations}{15}{appendix.A}
-\contentsline {subsection}{\numberline {A.1}Detrending and Deseasonalization}{15}{subsection.A.1}
-\contentsline {subsubsection}{\numberline {A.1.1}Daily Data}{15}{subsubsection.A.1.1}
+\contentsline {subsection}{\numberline {A.1}Detrending and Deseasonalization}{16}{subsection.A.1}
+\contentsline {subsubsection}{\numberline {A.1.1}Daily Data}{16}{subsubsection.A.1.1}
 \contentsline {subsubsection}{\numberline {A.1.2}Monthly Data}{16}{subsubsection.A.1.2}
-\contentsline {subsection}{\numberline {A.2}Spectral Analysis}{16}{subsection.A.2}
+\contentsline {subsection}{\numberline {A.2}Spectral Analysis}{17}{subsection.A.2}
 \contentsline {subsection}{\numberline {A.3}Bootstrap Procedure}{18}{subsection.A.3}
 \contentsline {section}{\numberline {B}A Few Frequently Used Terms}{18}{appendix.B}

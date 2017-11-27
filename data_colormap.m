@@ -72,6 +72,8 @@ function varargout = data_colormap(dataset,color_split,varargin)
 %                           broad grey center (useful for scatterplots on a
 %                           white background)
 %
+%   All directories listed as [____] are set in various_defaults.m
+%
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
 %   Last edit: 10/17/2017

@@ -1,32 +1,31 @@
-function Plots_Log_Panel_prod(VarIndices,modelArray,varargin)
-% PLOTS_LOG_PANEL_PROD  plot log changes in variability vs log changes in 
+function panel_plots(VarIndices,modelArray,varargin)
+% PANEL_PLOTS  plot log changes in variability vs log changes in 
 %                       means
 %
-%   PLOTS_LOG_PANEL_PROD(VarIndices,modelArray) plots the log change in
-%   variability for the LF, XF, and Full (usually corresponding to < 1
-%   year, > 1 year, and all frequencies, respectively) frequency bands in
-%   the data defined by [VarIndices] and [modelArray] vs. log change in
-%   mean for each variable in [VarIndices] and changes between RCP8.5 and
-%   pre-industrial control experiment runs. The resulting figure has
-%   (num_freqs x num_models) subplots, up to 6 models, beyond which new
-%   figures are started until all models are plotted. The first principal
-%   component of the data in each panel is calculated and graphed. An
-%   annotation in each subplot gives Pearson's correlation coefficient, the
-%   slope of the first principal component, and the percentage of points
-%   offscale (these are also indicated on the map by points plotted on the
-%   corresponding axes beyond which they are offscale). If more than one
-%   model is listed in [modelArray], a set of cartoon axes below the panels
-%   shows the axes labels; these are otherwise posted on the axes
-%   themselves. A caption is printed, by default showing variable name and
-%   frequency, latitude bands shown (0-90 absolute by default), figure
-%   number if more than one, and a brief description of any modifications
-%   or clipping done through optional flags, if relevant. The data is
-%   colorcoded by absolute latitude, in a flipped jet-based colorscale with
-%   18 colors, given by a colorbar to the right of the panels. Graphs are
-%   saved as .eps files in /project/moyer/Kevin/FinalFigs/[VarDomain]. If
-%   only one model is selected, the file is named after the model.
-%   Otherwise, the file contains the string "ALLMODELS" in the filename
-%   model slot.
+%   PANEL_PLOTS(VarIndices,modelArray) plots the log change in variability
+%   for the LF, XF, and Full (usually corresponding to < 1 year, > 1 year,
+%   and all frequencies, respectively) frequency bands in the data defined
+%   by [VarIndices] and [modelArray] vs. log change in mean for each
+%   variable in [VarIndices] and changes between RCP8.5 and pre-industrial
+%   control experiment runs. The resulting figure has (num_freqs x
+%   num_models) subplots, up to 6 models, beyond which new figures are
+%   started until all models are plotted. The first principal component of
+%   the data in each panel is calculated and graphed. An annotation in each
+%   subplot gives Pearson's correlation coefficient, the slope of the first
+%   principal component, and the percentage of points offscale (these are
+%   also indicated on the map by points plotted on the corresponding axes
+%   beyond which they are offscale). If more than one model is listed in
+%   [modelArray], a set of cartoon axes below the panels shows the axes
+%   labels; these are otherwise posted on the axes themselves. A caption is
+%   printed, by default showing variable name and frequency, latitude bands
+%   shown (0-90 absolute by default), figure number if more than one, and a
+%   brief description of any modifications or clipping done through
+%   optional flags, if relevant. The data is colorcoded by absolute
+%   latitude, in a flipped jet-based colorscale with 18 colors, given by a
+%   colorbar to the right of the panels. Graphs are saved as .eps files in
+%   [figure_dir]/[VarDomain]. If only one model is selected, the file is
+%   named after the model. Otherwise, the file contains the string
+%   "ALLMODELS" in the filename model slot.
 %
 %   Data requirements: _sqrtPower, _LocalMeans, _StdDevCI (if
 %   'remove_insig' flag used), for two experiments for the models listed in
@@ -46,7 +45,7 @@ function Plots_Log_Panel_prod(VarIndices,modelArray,varargin)
 %   subplot_pos, FileDomain, name_chars, var_chars, and (from Mathworks 
 %   community) dsn2fu and structfind.
 %
-%   PLOTS_LOG_PANEL_PROD(...,'[flag]',[params],...) modify program run 
+%   PANEL_PLOTS(...,'[flag]',[params],...) modify program run 
 %   as below:
 %
 %       Data management flags:
@@ -280,8 +279,8 @@ function Plots_Log_Panel_prod(VarIndices,modelArray,varargin)
 %                                               _[fig#]of[#]...
 %                                               .eps
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package,
+%   but is in beta. 
 %
 %   NOTE: this code is designed to be relatively modular. To change loaded
 %   data, see section "4.3.1.1 Load Data". To change how data is
@@ -297,13 +296,15 @@ function Plots_Log_Panel_prod(VarIndices,modelArray,varargin)
 %   NOTE: NaNs and Infs are removed from the dataset prior to calculations
 %   of correlation and principal components.
 %
+%   All directories listed as [____] are set in various_defaults.m
+%
 %   See also  CLIP_LAT, CLIP_REGION, CLIP_VAR_MAX, CLIP_VAR_MIN, CLIP_CI,
 %   LOAD_MEANS, LOAD_STDDEVS, VARIABILITY, VARIABILITY_CI, MAPLIMITS,
 %   VARIOUS_DEFAULTS
 %   
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
-%   Last modified 03/06/2017
+%   Last modified 11/27/2017
 
 %% 1 Set Display Settings
 %Set axes labels
@@ -329,7 +330,7 @@ DisplaySettings = struct('pointsx',{2560,2560,792,792},'pointsy',{1200,1200,576,
 
 %% 2 Set Defaults / Deal with Option Flags
 %Gather directory / naming conventions
-various_defaults = matfile('/project/moyer/Kevin/Code/various_defaults.mat');
+various_defaults = matfile('various_defaults.mat');
 
 %Allow for non-cell inputs of a single model
 if isa(modelArray,'char')
@@ -414,12 +415,12 @@ if (~isempty(varargin))
             case {'clip_minval'}
                 clip_minval = true;
                 if length(varargin) >= in_idx+2
-                    if islogical(varargin{in_idx+2});
+                    if islogical(varargin{in_idx+2})
                         clip_minval_display = varargin{in_idx+2};
                     end
                 end
                 %In case of precipitation, input in cm/yr (data in kg/m^2s)
-                if VarIndices == 20 || VarIndices == 5 || VarIndices == 29;
+                if VarIndices == 20 || VarIndices == 5 || VarIndices == 29
                     clip_minval_min = varargin{in_idx+1}/((1/1000)*100*60*60*24*365); %CHANGES UNITS INTO FROM cm/yr TO kg/m^2s (DATA UNITS)
                     clip_minval_disp = varargin{in_idx+1};
                 else
@@ -428,12 +429,12 @@ if (~isempty(varargin))
             case {'clip_maxval'}
                 clip_maxval = true;
                 if length(varargin) >= in_idx+2
-                    if islogical(varargin{in_idx+2});
+                    if islogical(varargin{in_idx+2})
                         clip_maxval_display = varargin{in_idx+2};
                     end
                 end
                 %In case of precipitation, input in cm/yr (data in kg/m^2s)
-                if VarIndices == 20 || VarIndices == 5;
+                if VarIndices == 20 || VarIndices == 5
                     clip_maxval_max = varargin{in_idx+1}/((1/1000)*100*60*60*24*365); %CHANGES UNITS INTO FROM cm/yr TO kg/m^2s (DATA UNITS)
                 else
                     clip_maxval_max = varargin{in_idx+1};
@@ -540,7 +541,7 @@ if (~isempty(varargin))
                     if strcmp(colorby_idx2{1},'mean')
                            colorby_idx2_tmp(1) = 1; 
                            ctype = 'mean';
-                    else colorby_idx2_tmp(1) = 0; ctype = 'variab';
+                    else colorby_idx2_tmp(1) = 0; ctype = 'variab'; %#ok<*SEPEX>
                     end
                     %(If 'std', and not 'mean, need actual data struct
                     %to determine index, is determined below)
@@ -716,7 +717,7 @@ else
 end   
 
 %Create subplot grid, based on number of models and frequency bands inputted
-if num_models > 6; %(set up to do 6 models / figure, so creates more figures if more than 6 models)
+if num_models > 6 %(set up to do 6 models / figure, so creates more figures if more than 6 models)
     %Get number of figures, with 6 or fewer models per figure
     num_figures = floor(num_models/6);
     if mod(num_models,6)~=0
@@ -742,7 +743,7 @@ else
 end
 
 %% 4 Plotting/Execution
-for var_idx = VarIndices;
+for var_idx = VarIndices
     %% 4.1 Variable Setup
     %Define file variable identifiers
     [~,filevarFN,freq,vardesc,units,~,~,freqdesc,~] = var_chars(var_idx);
@@ -754,7 +755,7 @@ for var_idx = VarIndices;
     coeff = cell(length(show_freqs),length(modelArray)); explained = cell(length(show_freqs),length(modelArray));
     
     %% 4.2 Set base filename
-    if ~isempty(alt_save_dir);
+    if ~isempty(alt_save_dir)
         filename_dir = alt_save_dir;
     else
         filename_dir = [various_defaults.figure_dir,FileDomain(filevarFN),'/'];
@@ -785,7 +786,7 @@ for var_idx = VarIndices;
         figure1 = figure('visible',visible_set,'PaperUnits','points','PaperPositionMode','manual','PaperPosition',[0 0 DisplaySettings(disp_idx).pointsx DisplaySettings(disp_idx).pointsy]);
         
         %% 4.3.2 Plot by Model
-        for j=1:num_models;    
+        for j=1:num_models
             %% 4.3.2.1 Load Data
             %Get file names/characteristics of files of inputted var/exp/model
             if ~process_byseason
@@ -793,7 +794,7 @@ for var_idx = VarIndices;
                 [~,~,strtyr,~,~] = name_chars(modelArray{j},expArray,filevarFN,freq);
             else
                 season_load = season;
-                folder = folder_season; dir_seas = ['/project/moyer/Kevin/',modelArray{j},folder];
+                folder = folder_season; dir_seas = [various_defaults.proc_data_dir,modelArray{j},folder];
                 [~,~,strtyr,~,~] = name_chars(modelArray{j},expArray,filevarFN,freq,'directory',dir_seas,'file_end',['*Power_',season,'.mat']);
             end
             
@@ -808,11 +809,11 @@ for var_idx = VarIndices;
             Data(2,2).Raw = Data(2,2).Raw(structfind(Data(2,2).Raw,'ID','mean')).Data;
             
             %Load area scaling weights for mean calculations
-            filename_w = strcat('/project/moyer/Kevin/Code/GridWeights/',modelArray{j},'_GridWeights');
+            filename_w = strcat(various_defaults.code_dir,'GridWeights/',modelArray{j},'_GridWeights');
             load(filename_w); GridWeights_tmp = GridWeights; clear GridWeights
             
             %Load Mean of a different variable, if scaling by var Change
-            if scale_byvar;
+            if scale_byvar
                 LocalMeans_scale{1} = load_means(scale_varidx,modelArray{j},expArray{2},'start_year',strtyr{2});
                 LocalMeans_scale{2} = load_means(scale_varidx,modelArray{j},expArray{1},'start_year',strtyr{1});
                 
@@ -888,7 +889,7 @@ for var_idx = VarIndices;
             %mean, and not in the same struct format as the variability
             %data, and has to be dealt with slightly differently (.Raw is
             %the last level in this struct in this case)
-            if strcmp(color_by,'data') || strcmp(color_by,'data_ratio');
+            if strcmp(color_by,'data') || strcmp(color_by,'data_ratio')
                 if colorby_idx2(1) ~= 1; colorby_data{1} = Data(colorby_idx1(1)).Raw(colorby_idx2(1)).Data;
                 else colorby_data{1} = Data(colorby_idx1(1)).Raw; end
                 if strcmp(color_by,'data_ratio')
@@ -942,7 +943,7 @@ for var_idx = VarIndices;
             
             %Throw error if too much is clipped
             if any(cellfun(@length,idx_display_clip)==length(lat)*length(lon))
-                error('Plots_Log_Panel_prod:TooMuchClipped','no display of points possible; all points are clipped, please choose less restrictive clipping limits');
+                error('PANEL_PLOTS:TooMuchClipped','no display of points possible; all points are clipped, please choose less restrictive clipping limits');
             end
             
             %Clip points determined through the process above. 
@@ -997,14 +998,14 @@ for var_idx = VarIndices;
             
             %Set points to be fit through (potentially different from
             %points displayed)
-            if any(cellfun(@isempty,idx_fit_clip)); %If no special subsetting for points to be fit through, set equal to points displayed
+            if any(cellfun(@isempty,idx_fit_clip)) %If no special subsetting for points to be fit through, set equal to points displayed
                 idx_fit_clip = idx_display_clip;
             end
             
             %If number of points clipped is the same length as number of
             %pixels (nothing to be plotted), throw error
             if any(cellfun(@length,idx_display_clip)==length(lat)*length(lon))
-                error('Plots_Log_Panel_prod:TooMuchClipped','no fit calculations possible; all points are clipped, please choose less restrictive clipping limits');
+                error('PANEL_PLOTS:TooMuchClipped','no fit calculations possible; all points are clipped, please choose less restrictive clipping limits');
             end
             
             %% 4.3.2.4 Calculate Quantities to be Graphed and Related Statistics
@@ -1130,8 +1131,8 @@ for var_idx = VarIndices;
                 %Attempt to use intermodel stats to set an intermodel
                 %applicable color range
                 if strcmp(color_by,'data_ratio')
-                    if exist(['/project/moyer/Kevin/IntermodelStats/',filevarFN,freq,expArray{colorby_idx1(1)},'_',expArray{colorby_idx1(2)},'_IntermodelRatioStats.mat'],'file')
-                        load(['/project/moyer/Kevin/IntermodelStats/',filevarFN,freq,expArray{colorby_idx1(1)},'_',expArray{colorby_idx1(2)},'_IntermodelRatioStats.mat'])
+                    if exist([various_defaults.proc_data_dir,'IntermodelStats/',filevarFN,freq,expArray{colorby_idx1(1)},'_',expArray{colorby_idx1(2)},'_IntermodelRatioStats.mat'],'file')
+                        load([various_defaults.proc_data_dir,'IntermodelStats/',filevarFN,freq,expArray{colorby_idx1(1)},'_',expArray{colorby_idx1(2)},'_IntermodelRatioStats.mat'])
                         %Find relevant statistic in Intermodel Stats
                         if strcmp(ctype,'mean');cfreq_idx = structfind(Intermodel_Ratio_Stats,'ID','mean');
                         else cfreq_idx = structfind(Intermodel_Ratio_Stats,'ID',Data(colorby_idx1(1)).Raw(colorby_idx1(1)).ID);
@@ -1151,9 +1152,9 @@ for var_idx = VarIndices;
                         c_range = def_crange;
                     end
                 elseif strcmp(color_by,'data')
-                    if exist(['/project/moyer/Kevin/IntermodelStats/',filevarFN,freq,expArray{colorby_idx1(1)},'_IntermodelStats.mat'],'file')
+                    if exist([various_defaults.proc_data_dir,'IntermodelStats/',filevarFN,freq,expArray{colorby_idx1(1)},'_IntermodelStats.mat'],'file')
                         %Load intermodel stats
-                        load(['/project/moyer/Kevin/IntermodelStats/',filevarFN,freq,expArray{colorby_idx1(1)},'_IntermodelStats.mat'])
+                        load([various_defaults.proc_data_dir,'IntermodelStats/',filevarFN,freq,expArray{colorby_idx1(1)},'_IntermodelStats.mat'])
                         %Find relevant statistic in Intermodel Stats
                         if strcmp(ctype,'mean');cfreq_idx = structfind(IntermodelStats,'ID','mean');
                         else cfreq_idx = structfind(IntermodelStats,'ID',Data(colorby_idx1(1)).Raw(colorby_idx1(1)).ID);
@@ -1258,13 +1259,13 @@ for var_idx = VarIndices;
             
             for vars = 1:num_freqs
                 %% 4.3.1.6a Create Subplots
-                if num_models > 1;
-                    if num_figures>1; %6 x num_freqs grid, for num_models > 6
+                if num_models > 1
+                    if num_figures>1 %6 x num_freqs grid, for num_models > 6
                         subplot(num_freqs,6,model_vars_subscripts(vars,j))
                     else %num_models x num_freqs grid, for num_models <= 6
                         subplot(num_freqs,num_models,model_vars_subscripts(vars,j));
                     end
-                elseif num_models == 1;
+                elseif num_models == 1
                     subplot('Position',DisplaySettings(disp_idx).subp_position(vars,:))
                 end
                 
@@ -1320,7 +1321,7 @@ for var_idx = VarIndices;
                 slp{vars,(f-1)*6+j} = coeff{vars,(f-1)*6+j}(2,1)/coeff{vars,(f-1)*6+j}(1,1);
                 
                 %Plot 1st principal component
-                if show_fit; 
+                if show_fit 
                     pca_line = plot(X1,slp{vars,(f-1)*6+j}*(X1-mu{vars,(f-1)*6+j}(1))+mu{vars,(f-1)*6+j}(2),'LineWidth',DisplaySettings(disp_idx).line_width,'DisplayName','1st principal component');
                     pca_line.Color = [128/255,141/255,169/255];
                 end
@@ -1436,7 +1437,7 @@ for var_idx = VarIndices;
             if isempty(cust_caption)
                 %Get long experiment names
                 exp_name = cell(2,1);
-                for i = 1:2;
+                for i = 1:2
                     try
                         exp_name(i) = various_defaults.expArray_disp(find(cellfun(@(x) strcmp(expArray{i},x),various_defaults.expArray_disp(:,1))),2); %#ok<FNDSB>
                     catch %If not in various_defaults, just use the experiment 'raw'/save name
@@ -1510,6 +1511,10 @@ for var_idx = VarIndices;
     %% 4.4 Save Stats
     if save_stats
         modelArray = [modelArray_sub{:}];
+        if ~exist([filename_dir,'Stats/'])
+            mkdir([filename_dir,'Stats/'])
+            warning([filename_dir,'Stats/ created.'])
+        end
         filename_stats = strcat(filename_dir,'Stats/',filename_base,'_stats',filename_add);
         if ~isempty(struct_idxs); freq_names{:} = {Data(struct_idxs(1)).Raw(freq_ids(1,:)).Name};
         else freq_names = 'no frequency-dependent data involved';end 

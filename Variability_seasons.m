@@ -113,14 +113,16 @@
 %   [filevar]_[freq]_[model]_[exp]_[run]_[strtyr]_[endyr]_sqrtPower_[season].mat
 %   [filevar]_[freq]_[model]_[exp]_[run]_[strtyr]_[endyr]_LocalMeans_[season].mat
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
 %
-%   See also VARIABILITY
+%   All directories listed as [____] are set in various_defaults.m
+%
+%   See also VARIABILITY, VARIABILITY_CI
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu
 %   Last modified 11/26/2017
+
 function Variability_seasons(VarIndices,modelArray,varargin)
 
 %Set clock (for logging purposes)

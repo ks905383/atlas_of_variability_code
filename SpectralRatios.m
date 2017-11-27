@@ -47,8 +47,9 @@ function SpectralRatios(VarIndices,modelArray,varargin)
 %   StdDevRatios(band).Size = [2 x 1 array] (freq band size, i.e. [0,5],...)
 %   StdDevRatios(band).Data = [nlon x nlat array] (Variability Ratios)
 %
-%   NOTE: this function is part of the /project/moyer/ climate data file
-%   ecosystem.
+%   NOTE: this function is part of the Atlas of Variability code package
+%
+%   All directories listed as [____] are set in various_defaults.m
 %
 %   For questions/comments, contact Kevin Schwarzwald
 %   kschwarzwald@uchicago.edu

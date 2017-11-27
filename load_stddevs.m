@@ -84,6 +84,8 @@ function varargout = load_stddevs(var_idx,model,exp,varargin)
 %
 %   NOTE: this function is part of the Atlas of Variability code package
 %
+%   All directories listed as [____] are set in various_defaults.m
+%
 %   See also LOAD_MEANS, NAME_CHARS,
 %
 %   For questions/comments, contact Kevin Schwarzwald

@@ -143,6 +143,8 @@ function Maps_ratio(VarIndices,modelArray,varargin)
 %
 %   NOTE: this function is part of the Atlas of Variability code package
 %
+%   All directories listed as [____] are set in various_defaults.m
+%
 %   KNOWN BUGS/ETC.: If there are weird smears, white lines, etc. in your
 %   map, it's probably related to the process of wrapping to 360. In
 %   general, pcolorm has issues at the wraparound break (the last/first
