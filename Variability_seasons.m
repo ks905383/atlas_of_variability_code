@@ -274,7 +274,7 @@ for i=1:length(VarIndices)
                             %if season crosses over a year boundary, total
                             %number of seasons ("years") will be one less
                             %than years in file
-                            if (regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>365) || (~regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>12)
+                            if (any(regexp(freq,'.[Dd]ay.')) && seasonStart{freq_def,season}+season_length>365) || (~any(regexp(freq,'.[Dd]ay.')) && seasonStart{freq_def,season}+season_length>12)
                                 years = prefTimeframe{season}-1; %years = how many seasons in time series
                             else %if season doesn't go over a year boundary
                                 years = prefTimeframe{season};
@@ -282,7 +282,7 @@ for i=1:length(VarIndices)
                             %years = 30;
                             startbias = 0;
                         elseif endyr{1}-strtyr{1}+1>prefTimeframe{season} %if _DATA file is longer than needed for specific season (taking last [xx] years wanted)
-                            if (regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>365) || (~regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>12)
+                            if (any(regexp(freq,'.[Dd]ay.')) && seasonStart{freq_def,season}+season_length>365) || (~any(regexp(freq,'.[Dd]ay.')) && seasonStart{freq_def,season}+season_length>12)
                                 years = prefTimeframe{season}-1; %years = how many seasons in time series
                             else %if season doesn't go over a year boundary
                                 years = prefTimeframe{season};
@@ -290,7 +290,7 @@ for i=1:length(VarIndices)
                             startbias = endyr{1}-strtyr{1}+1-prefTimeframe{season};
                         else %if _DATA file is shorter than preferred
                             %if season crosses a year boundary
-                            if (regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>365) || (~regexp(freq,'.[Dd]ay.') && seasonStart{freq_def,season}+season_length>12)
+                            if (any(regexp(freq,'.[Dd]ay.')) && seasonStart{freq_def,season}+season_length>365) || (~any(regexp(freq,'.[Dd]ay.')) && seasonStart{freq_def,season}+season_length>12)
                                 years = endyr{1}-strtyr{1};
                             else %if season doesn't go over a year boundary
                                 years = endyr{1}-strtyr{1}+1;
